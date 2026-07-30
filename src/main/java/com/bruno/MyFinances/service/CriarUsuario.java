@@ -21,8 +21,8 @@ public class CriarUsuario {
         this.repositorio = repositorioRecebido;
     }
 
-    public void criarUser(String nomeComp, String email, String senha, BigDecimal salario, LocalDate dataNascimento) {
-        Usuario criarUser = new Usuario(nomeComp, email, senha, salario, dataNascimento);
+    public void criarUser(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome) {
+        Usuario criarUser = new Usuario(nome_primeiro, email, senha, salario, dataNascimento, sobrenome);
         try 
         {
             repositorio.save(criarUser);

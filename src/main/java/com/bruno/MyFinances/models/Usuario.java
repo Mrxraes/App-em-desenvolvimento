@@ -23,13 +23,15 @@ public class Usuario {
     @NotBlank
     private String senha;
 
-    private String nomeComp;
+    private String nome_primeiro;
+    private String sobrenome;
     private BigDecimal salario;
     private LocalDate dataNascimento;
     
-    public Usuario(String nomeComp, String email, String senha, BigDecimal salario, LocalDate dataNascimento) {
+    public Usuario(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome) {
        
-        this.nomeComp = nomeComp;
+        this.nome_primeiro = nome_primeiro;
+        this.sobrenome = sobrenome;
         this.email = email;
         this.senha = senha;
         this.salario = salario;

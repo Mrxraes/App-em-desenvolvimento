@@ -2,6 +2,7 @@ package com.bruno.MyFinances.service;
 
 import org.springframework.stereotype.Service;
 
+
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
 @Service
@@ -9,10 +10,14 @@ public class Email {
 
     private final Digitacao digitar;
     private final UsuarioRepository existe;
+    private final CriarCodigo criarCod;
+    private final EmailAutenticacao enviarEmail;
 
-    public Email(Digitacao digitarRecebido, UsuarioRepository metodosRecebidos) {
+    public Email(Digitacao digitarRecebido, UsuarioRepository metodosRecebidos, CriarCodigo criarCod,  EmailAutenticacao enviarEmail) {
         this.digitar = digitarRecebido;
         this.existe = metodosRecebidos;
+        this.criarCod = criarCod;
+        this.enviarEmail = enviarEmail;
     }
 
     public boolean valida;
@@ -78,12 +83,32 @@ public class Email {
                 valida = false;
                 digitar.digitar("O tipo de dominio é inválido.");
             }
+
         } else {
             valida = false;
             digitar.digitar("Email não pode ser nulo");
         }
                 resultado(valida, existeEmail);
-
-
 }
+
+    public boolean emailAutenticacao(String email, String cadsLogin, String nome) throws InterruptedException {
+        boolean real = false;
+        digitar.digitar("| VERIFICAÇÃO DE EMAIL |");
+        digitar.digitar("Um código foi enviado ao e-mail '" + email + "', confirme para prosseguir no " + cadsLogin);
+        String codigo = criarCod.criarCod();
+        existe.inserirCod(codigo);
+        String codigoTable =  existe.pegarCod(codigo);
+
+        enviarEmail.enviarEmailAutenticacao(codigoTable, email, cadsLogin, nome);
+
+        String digitarCod  = digitar.ler().toUpperCase();
+        if (digitarCod.equals(codigoTable)) {
+            real = true;
+        } else {
+            System.out.println("Não foi possível concluir " + cadsLogin );
+        }
+        existe.excluirCod(codigoTable);
+        return real;
+    }
+
 }

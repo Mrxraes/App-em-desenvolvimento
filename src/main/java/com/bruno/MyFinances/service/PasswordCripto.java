@@ -29,7 +29,7 @@ public class PasswordCripto {
         String senhaHashBanco =  metodos.consultarSenha(email);
         if (BCrypt.checkpw(senha, senhaHashBanco)) {
                 senhaMatch = true;
-                System.out.println("Tudo certo!");
+                //System.out.println("Tudo certo!");
         } else {
             System.out.println("Senha incorreta.");
         }

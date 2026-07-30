@@ -30,7 +30,8 @@ public class Cadastro {
 
     }
 
-    public String nome;
+    public String nome_primeiro;
+    public String sobrenome;
     public String email;
     public String senha;
     public String senhaConfirm;
@@ -47,11 +48,15 @@ public class Cadastro {
         boolean cadastroSucedido = false;
         boolean condicaoSenha = false;
         boolean condicaoEmail = false;
+        boolean donoEmail = false;
     try {
 
         digitar.digitar("| CADASTRO |");
-        digitar.digitar("Me informe seu nome completo: "); 
-        nome = digitar.ler();;
+        digitar.digitar("Me informe o seu primeiro nome:"); 
+        nome_primeiro = digitar.ler();
+
+        digitar.digitar("Me informe o seu sobrenome:"); 
+        sobrenome = digitar.ler();;
 
         boolean condicao = false;
         while (condicao == false) {
@@ -66,6 +71,7 @@ public class Cadastro {
             } else if (emailExiste.equals("0") && condicaoEmail == true) {
                 condicao = condicaoEmail;
             }
+           
         }
 
         while (condicaoSenha == false && perguntarSenha == true) {
@@ -85,7 +91,13 @@ public class Cadastro {
             dataNascimento = digitar.ler();;
             LocalDate dataNas = LocalDate.parse(dataNascimento, formatter);
             String senhaHash = criptografarSenha.criptografiaSenha().encode(senha);
-            criarUser.criarUser(nome, email.trim().toLowerCase(), senhaHash, salarioBig, dataNas);
+            donoEmail = validarEmail.emailAutenticacao(email.trim().toLowerCase(), "cadastro", nome_primeiro);
+                if (donoEmail == false) {
+                    perguntarSenha = false;
+                } else if (donoEmail == true) {
+                    criarUser.criarUser(nome_primeiro, email.trim().toLowerCase(), senhaHash, salarioBig, dataNas, sobrenome);
+                }
+            
         }
        
     } 

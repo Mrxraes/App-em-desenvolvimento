@@ -1,4 +1,5 @@
 package com.bruno.MyFinances.Controller;
+import com.bruno.MyFinances.repository.UsuarioRepository;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
 import com.bruno.MyFinances.service.Password;
@@ -15,12 +16,14 @@ import org.springframework.stereotype.Controller;
         private final Email validarEmail;
         private final Password validarSenha;
         private final PasswordCripto senhaMatch;
+        private final UsuarioRepository repositorio;
 
-        public Login(Digitacao digitarRecebido, Email validarEmail, Password validarSenha,  PasswordCripto senhaMatch) {
+        public Login(Digitacao digitarRecebido, Email validarEmail, Password validarSenha,  PasswordCripto senhaMatch, UsuarioRepository repositorio) {
             this.digitar = digitarRecebido;
             this.validarEmail = validarEmail;
             this.validarSenha = validarSenha;
             this.senhaMatch = senhaMatch;
+            this.repositorio = repositorio;
         }
 
         private String email;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Controller;
             boolean condicaoSenha = false;
             boolean condicaoEmail = false;
             boolean senhaIguais = false;
+            boolean donoEmail = false;
 
         try 
         {
@@ -48,16 +52,16 @@ import org.springframework.stereotype.Controller;
                 validarEmail.validarEmail(emailFormatado);
                 condicaoEmail = validarEmail.getValida();
                 emailExiste = validarEmail.getEmailExiste();
-                if (emailExiste.equals("0") && condicaoEmail == true) {
+                if (emailExiste.equals("0")) {
                     perguntarSenha = false;
+                    break;
                 }
-            
+                
             }
                 
                     //System.out.println("passa pra frente");
 
-
-            while (condicaoSenha == false || senhaIguais == false || perguntarSenha == true) {
+            while (senhaIguais == false && perguntarSenha == true) {
                     digiteSenha(); 
                     condicaoSenha = validarSenha.validaSenha(senhaFormatada);
                     senhaIguais = senhaMatch.macthSenha(senhaFormatada, emailFormatado); 
@@ -69,11 +73,12 @@ import org.springframework.stereotype.Controller;
         catch (InterruptedException e) 
         {
             e.printStackTrace();
-        }
-                
-            if (condicaoEmail == true && condicaoSenha == true && perguntarSenha == false && emailExiste.equals("1") && senhaIguais == true)  {
-                loginSucedido = true;
+        }   
+            String primeiro_nome = repositorio.consultarNome(email);
+            donoEmail = validarEmail.emailAutenticacao(emailFormatado, "login", primeiro_nome); 
+            if (condicaoEmail == true && condicaoSenha == true && perguntarSenha == false && emailExiste.equals("1") && senhaIguais == true && donoEmail == true)  {
                 digitar.digitar("Login bem sucedido!");
+                loginSucedido = true;
             }
                     //System.out.println("retorna");
             setEmailLogin(emailExiste);
