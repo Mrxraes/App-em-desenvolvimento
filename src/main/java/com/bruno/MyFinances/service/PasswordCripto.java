@@ -26,13 +26,14 @@ public class PasswordCripto {
     public boolean macthSenha(String senha, String email) {
         
         boolean senhaMatch = false;
+        String emailExiste = metodos.existeEmail(email);
         String senhaHashBanco =  metodos.consultarSenha(email);
         if (BCrypt.checkpw(senha, senhaHashBanco)) {
                 senhaMatch = true;
                 //System.out.println("Tudo certo!");
-        } else {
+        } /* else {
             System.out.println("Senha incorreta.");
-        }
+        } */
         return senhaMatch;
     }    
 }

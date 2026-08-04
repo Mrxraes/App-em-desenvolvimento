@@ -1,5 +1,8 @@
 package com.bruno.MyFinances.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 
@@ -11,9 +14,9 @@ public class Email {
     private final Digitacao digitar;
     private final UsuarioRepository existe;
     private final CriarCodigo criarCod;
-    private final EmailAutenticacao enviarEmail;
+    private final EnviarEmail enviarEmail;
 
-    public Email(Digitacao digitarRecebido, UsuarioRepository metodosRecebidos, CriarCodigo criarCod,  EmailAutenticacao enviarEmail) {
+    public Email(Digitacao digitarRecebido, UsuarioRepository metodosRecebidos, CriarCodigo criarCod,  EnviarEmail enviarEmail) {
         this.digitar = digitarRecebido;
         this.existe = metodosRecebidos;
         this.criarCod = criarCod;
@@ -92,22 +95,73 @@ public class Email {
 }
 
     public boolean emailAutenticacao(String email, String cadsLogin, String nome) throws InterruptedException {
-        boolean real = false;
+        String codigoTable = "";
+        boolean real;
+        LocalDateTime criado = LocalDateTime.now();
         digitar.digitar("| VERIFICAÇÃO DE EMAIL |");
-        digitar.digitar("Um código foi enviado ao e-mail '" + email + "', confirme para prosseguir no " + cadsLogin);
+        digitar.digitar("Um código de 6 dígitos foi enviado ao e-mail '" + email + " , confirme para prosseguir no " + cadsLogin);
         String codigo = criarCod.criarCod();
         existe.inserirCod(codigo);
-        String codigoTable =  existe.pegarCod(codigo);
-
+        codigoTable =  existe.pegarCod(codigo);
         enviarEmail.enviarEmailAutenticacao(codigoTable, email, cadsLogin, nome);
+        digitar.digitar("Caso precise de um novo código, digite 'ENVIAR'");
 
-        String digitarCod  = digitar.ler().toUpperCase();
-        if (digitarCod.equals(codigoTable)) {
-            real = true;
-        } else {
-            System.out.println("Não foi possível concluir " + cadsLogin );
+        boolean codigoExpirado = false;
+        boolean sair = false;
+            while (true) {
+            //ARRUMAR ESSE FLUXO
+            real = false;
+            String digitarCod = null; 
+            String escolha = null;  
+
+            if (codigoExpirado == true) {
+                digitarCod = "ENVIAR";
+            } else if (codigoExpirado == false) {
+                if (sair == true) {
+                digitar.digitar("Saindo...");
+                break;
+            } else {
+                digitarCod =  digitar.ler().toUpperCase();
+            }
+
+            } 
+            
+            LocalDateTime agora = LocalDateTime.now();
+            Duration tempo = Duration.between(criado, agora);
+            System.out.println("voltou");
+            if (digitarCod.equals(codigoTable)) {
+                if (tempo.toSeconds() < 300) {
+                real = true;
+                break; }
+                else {
+                    digitar.digitar("Código expirado!");
+                    digitar.digitar("Digite 'ENVIAR' para obter um novo código ou 'SAIR' para finalizar.");
+                    escolha  = digitar.ler().toUpperCase();
+                    if (escolha.equals("ENVIAR")) {
+                        codigoExpirado = true;
+                    } else if (escolha.equals("SAIR")) {
+                        sair = true;
+                    } else {
+                        digitar.digitar("Opção inválida.");
+                    }
+                }
+            } else if (digitarCod.equals("ENVIAR") || codigoExpirado == true) {
+                digitar.digitar("Um novo email com seu código foi enviado.");
+                codigo = criarCod.criarCod();
+                existe.inserirCod(codigo);
+                codigoTable =  existe.pegarCod(codigo);
+                enviarEmail.enviarEmailAutenticacao(codigoTable, email, cadsLogin, nome);
+                codigoExpirado = false;
+            } else {
+                digitar.digitar("| Não foi possível concluir " + cadsLogin + " |");
+                digitar.digitar("Código inválido. Tente novamente! ");
+                if (digitarCod.length() > 6) {
+                    digitar.digitar("O código possui apenas 6 dígitos.");
+                }
+            }
+
         }
-        existe.excluirCod(codigoTable);
+        existe.excluirCod();
         return real;
     }
 

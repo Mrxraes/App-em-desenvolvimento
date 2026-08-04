@@ -2,8 +2,11 @@ package com.bruno.MyFinances.Controller;
 import com.bruno.MyFinances.service.CriarUsuario;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
+import com.bruno.MyFinances.service.EnviarEmail;
 import com.bruno.MyFinances.service.Password;
 import com.bruno.MyFinances.service.PasswordCripto;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,14 +23,18 @@ public class Cadastro {
     private final Email validarEmail;
     private final Password validarSenha;
     private final PasswordCripto criptografarSenha;
+    private final BuscarIP http;
+    private final HttpServletRequest request;
 
-    public Cadastro(CriarUsuario criador, Digitacao digitarRecebido, Email validarEmail, Password validarSenha, PasswordCripto criptografarSenha) {
+    public Cadastro(CriarUsuario criador, Digitacao digitarRecebido, Email validarEmail, Password validarSenha, PasswordCripto criptografarSenha, BuscarIP http,  
+        HttpServletRequest request) {
         this.criarUser = criador;
         this.digitar = digitarRecebido;
         this.validarEmail = validarEmail;
         this.validarSenha = validarSenha;
         this.criptografarSenha = criptografarSenha;
-
+        this.http = http;
+        this.request = request;
     }
 
     public String nome_primeiro;
@@ -50,6 +57,8 @@ public class Cadastro {
         boolean condicaoEmail = false;
         boolean donoEmail = false;
     try {
+
+        
 
         digitar.digitar("| CADASTRO |");
         digitar.digitar("Me informe o seu primeiro nome:"); 
@@ -100,6 +109,8 @@ public class Cadastro {
             
         }
        
+        
+
     } 
     catch (InterruptedException e) {
             e.printStackTrace();
@@ -110,7 +121,7 @@ public class Cadastro {
         if (criarUser.getUserSalvo() == true) {
             cadastroSucedido = true;
             digitar.digitar("Cadastro bem sucedido!");
-
+            http.IpLogin(request, email.trim().toLowerCase(), "login", nome_primeiro);
         }
         return cadastroSucedido;
     }

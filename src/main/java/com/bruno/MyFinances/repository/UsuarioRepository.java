@@ -24,9 +24,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         SELECT senha FROM usuario WHERE email = :email;    
         """, nativeQuery = true)
         String consultarSenha(@Param("email") String email);
+
+    @Query(value = """ 
+        UPDATE usuario SET senha = :senha WHERE email = :email;    
+        """, nativeQuery = true)
+        String mudarSenha(@Param("email") String email, @Param("senha") String senha);
     
      @Query(value = """ 
-        SELECT nome FROM usuario WHERE email = :email;    
+        SELECT nome_primeiro FROM usuario WHERE email = :email;    
         """, nativeQuery = true)
         String consultarNome(@Param("email") String email);
 
@@ -45,7 +50,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Modifying // Informa ao spring que isso faz uma modificação no banco de dados e não é apenas um select
     @Transactional // Se a operação nao ocorrer da forma correta ele corta tudo
     @Query(value = """
-            DELETE FROM codigoTemporario WHERE cod = :codigo
+            DELETE FROM codigoTemporario;
             """, nativeQuery = true)
-    int excluirCod(@Param("codigo") String codigo);           
+    int excluirCod();           
 }

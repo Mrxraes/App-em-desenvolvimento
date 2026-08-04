@@ -27,7 +27,7 @@ public class CriarCodigo {
         codigo += letras.get(i);
     }
 
-    System.out.println(codigo);
+    //System.out.println(codigo);
     return codigo;
     }
 }
