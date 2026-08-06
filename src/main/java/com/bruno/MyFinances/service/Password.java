@@ -2,15 +2,23 @@
     import java.util.Scanner;
 
     import org.springframework.stereotype.Service;
+    
+    import com.bruno.MyFinances.repository.UsuarioRepository;
 
     @Service
     public class Password {
         public Scanner ler = new Scanner(System.in);
 
         private final Digitacao digitar;
+        private final Email email;
+        private final UsuarioRepository repositorio;
+        private final PasswordCripto criptografarSenha;
 
-        public Password(Digitacao digitacaoRecebida) {
+        public Password(Digitacao digitacaoRecebida, Email email, UsuarioRepository repositorio, PasswordCripto criptografarSenha) {
             this.digitar = digitacaoRecebida;
+            this.email = email;
+            this.repositorio = repositorio;
+            this.criptografarSenha = criptografarSenha;
         }
 
         /*public static void confirmarSenha(String senha, String senhaConfirm) throws InterruptedException {
@@ -92,4 +100,39 @@
             }
             return valida;
         }
+
+        private String senha1;
+        private String senha2;
+
+        public boolean redefinirSenha(String email, String nome) throws InterruptedException {
+            boolean redefinicaoSucedida = false;
+            boolean valido = this.email.emailAutenticacao(email, "restabelecimento", nome);  
+            digitar.digitar("Se existir uma conta associada a este e-mail, enviaremos as instruções de recuperação."); 
+            if (valido == true) {
+                digitar.digitar("| Altere a sua senha: |");
+                boolean senhaCorreta = false;
+                
+                    while (senhaCorreta == false) {
+                    digiteSenha();
+                    senhaCorreta = validaSenha(senha1, senha2);   
+                    }
+                if (senhaCorreta = true) {
+                    String senhaHash = criptografarSenha.criptografiaSenha().encode(senha1);
+                    int mudou = repositorio.mudarSenha(email, senhaHash);
+                    if (mudou == 1) {
+                        redefinicaoSucedida = true;
+                    }
+                }
+            }
+
+        return redefinicaoSucedida;
     }
+
+    public void digiteSenha() throws InterruptedException 
+    {
+        digitar.digitar("Digite a sua senha: "); 
+        senha1 = digitar.ler().trim();
+        digitar.digitar("Confirme a sua senha: "); 
+        senha2 = digitar.ler().trim();
+    }
+}

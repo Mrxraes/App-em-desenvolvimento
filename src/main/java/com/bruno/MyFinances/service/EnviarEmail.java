@@ -8,9 +8,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender; // conversa com o serviço SMTP --> Protocolo que transmita emails pela internet 
 import org.springframework.stereotype.Service;
 
-import com.bruno.MyFinances.Controller.BuscarIP;
-
-
 
 @Service
 public class EnviarEmail {

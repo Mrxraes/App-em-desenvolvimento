@@ -128,7 +128,6 @@ public class Email {
             
             LocalDateTime agora = LocalDateTime.now();
             Duration tempo = Duration.between(criado, agora);
-            System.out.println("voltou");
             if (digitarCod.equals(codigoTable)) {
                 if (tempo.toSeconds() < 300) {
                 real = true;
@@ -153,7 +152,6 @@ public class Email {
                 enviarEmail.enviarEmailAutenticacao(codigoTable, email, cadsLogin, nome);
                 codigoExpirado = false;
             } else {
-                digitar.digitar("| Não foi possível concluir " + cadsLogin + " |");
                 digitar.digitar("Código inválido. Tente novamente! ");
                 if (digitarCod.length() > 6) {
                     digitar.digitar("O código possui apenas 6 dígitos.");

@@ -24,11 +24,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         SELECT senha FROM usuario WHERE email = :email;    
         """, nativeQuery = true)
         String consultarSenha(@Param("email") String email);
-
-    @Query(value = """ 
-        UPDATE usuario SET senha = :senha WHERE email = :email;    
-        """, nativeQuery = true)
-        String mudarSenha(@Param("email") String email, @Param("senha") String senha);
     
      @Query(value = """ 
         SELECT nome_primeiro FROM usuario WHERE email = :email;    
@@ -52,5 +47,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query(value = """
             DELETE FROM codigoTemporario;
             """, nativeQuery = true)
-    int excluirCod();           
+    void excluirCod();           
+
+    @Modifying // tudo que altera no banco de dados precisa disso, e não pode retornar string
+    @Transactional
+    @Query(value = """ 
+        UPDATE usuario SET senha = :senha WHERE email = :email;    
+        """, nativeQuery = true)
+        int mudarSenha(@Param("email") String email, @Param("senha") String senha);
 }

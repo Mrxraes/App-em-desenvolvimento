@@ -2,7 +2,6 @@ package com.bruno.MyFinances.Controller;
 import com.bruno.MyFinances.service.CriarUsuario;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
-import com.bruno.MyFinances.service.EnviarEmail;
 import com.bruno.MyFinances.service.Password;
 import com.bruno.MyFinances.service.PasswordCripto;
 
@@ -45,8 +44,8 @@ public class Cadastro {
     public String salario;
     public String dataNascimento;
     
-    private String espacoRemove;
-    private String espacoRemove1;
+    public String espacoRemove;
+    public String espacoRemove1;
     private String emailExiste;
     private String existeEmail;
 
@@ -58,7 +57,7 @@ public class Cadastro {
         boolean donoEmail = false;
     try {
 
-        
+
 
         digitar.digitar("| CADASTRO |");
         digitar.digitar("Me informe o seu primeiro nome:"); 

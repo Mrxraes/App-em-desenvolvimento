@@ -59,6 +59,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 					continue;
 				}
 			} 
+
 				else if (decisao.equals("2")) {
 				cadastroSucedido = cadastro.questoesCadastro();
 				emailExisteCadastro = cadastro.getExisteCadastro();
@@ -79,10 +80,8 @@ public class MyFinancesApplication implements CommandLineRunner {
 			}
 				if (cadastroSucedido == true || loginSucedido == true) {
 					autenticacao = true;
+					digitar.digitar("| INTERFACE |");
 				}
 		}
-
-		
-		
 	}
 }
