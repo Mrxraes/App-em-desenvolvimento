@@ -3,31 +3,35 @@ package com.bruno.MyFinances.models;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 @Entity
 public class Saida {
-
-    public static enum TipoSaida { // estabele os valores que são permitidos
-    VARIAVEL,
-    FIXO, 
-    INVESTIMENTO
-}
-
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+
+    @Column(name = "DataRegistro", nullable = false)
     private LocalDate  dataRegistro;
 
-    @Enumerated(EnumType.STRING) // Salva o número do enum no BD, mas possui uma formatação "STRING"
-    private TipoSaida tipo; // Declarada no tipo Class, e so aceita valores iguais ao TipoSaida. 
+    private String tipo; // Declarada no tipo Class, e so aceita valores iguais ao TipoSaida. 
 
-    private BigDecimal Valor;
+    private BigDecimal valor;
     private String obs;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private Usuario usuario;
+    
+    private BigInteger fk_user;
+    
+    public Saida(String nome, LocalDate registro, String tipo, BigDecimal valor, String obs, BigInteger id) {
+        this.nome = nome;
+        this.dataRegistro = registro;
+        this.tipo = tipo;
+        this.valor = valor;
+        this.obs = obs;
+        this.fk_user = id;
+    }
+
 }
 

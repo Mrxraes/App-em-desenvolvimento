@@ -4,6 +4,10 @@ import com.bruno.MyFinances.models.Usuario;
 
 import jakarta.transaction.Transactional;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +15,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
+    // VERIFICA SE E-MAIL EXISTE
     @Query(value = """
         SELECT CASE 
             WHEN EXISTS (SELECT 1 FROM usuario WHERE email = :email ) 
@@ -20,11 +25,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             """, nativeQuery = true) 
     String existeEmail(@Param("email") String email);
 
+    // PERGUNTA QUAL É A SENHA
     @Query(value = """ 
         SELECT senha FROM usuario WHERE email = :email;    
         """, nativeQuery = true)
         String consultarSenha(@Param("email") String email);
-    
+
+    // PERGUNTA NOME BASEADO NO E-MAIL DO USUARIO
      @Query(value = """ 
         SELECT nome_primeiro FROM usuario WHERE email = :email;    
         """, nativeQuery = true)
@@ -37,6 +44,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             """, nativeQuery = true)  
     int inserirCod(@Param("codigo") String codigo); 
 
+    // PEGA O CODIGO DESSA TABELA
     @Query(value = """
             SELECT cod FROM codigoTemporario WHERE cod = :codigo
             """, nativeQuery = true)  
@@ -55,4 +63,9 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         UPDATE usuario SET senha = :senha WHERE email = :email;    
         """, nativeQuery = true)
         int mudarSenha(@Param("email") String email, @Param("senha") String senha);
+
+    @Query(value = """
+            SELECT id FROM usuario WHERE email = :email
+            """, nativeQuery = true)
+        BigInteger pegarId(@Param("email") String email);
 }

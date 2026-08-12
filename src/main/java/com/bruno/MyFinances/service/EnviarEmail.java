@@ -38,7 +38,7 @@ public class EnviarEmail {
         String dataFormatada = agora.format(formatarDate);
         //
         mensagem.setTo(email);
-        mensagem.setSubject(cadasOuLogin + "realizado com sucesso no My Finances");
+        mensagem.setSubject("Login realizado com sucesso no My Finances");
         mensagem.setText(
         "Olá, " + nome + "! Informamos que o acesso à sua conta no My Finances foi realizado com sucesso.\n\n" +
         "Caso tenha sido você, nenhuma ação adicional é necessária. Agora você pode acessar sua plataforma e gerenciar suas finanças com segurança.\n\n" +

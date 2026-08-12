@@ -23,8 +23,9 @@ public class Email {
         this.enviarEmail = enviarEmail;
     }
 
-    public boolean valida;
-    public String emailExistente;
+    private boolean valida;
+    private String emailExistente;
+    private String emailRun;
 
     public void resultado(boolean valida, String existe) {
         this.valida = valida;
@@ -163,4 +164,13 @@ public class Email {
         return real;
     }
 
+     public void setEmail(String email) {
+        this.emailRun = email;
+    }
+
+    public String getEmail() {
+        return emailRun;
+    }
+
+    
 }

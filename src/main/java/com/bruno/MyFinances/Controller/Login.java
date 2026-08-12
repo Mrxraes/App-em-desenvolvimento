@@ -39,8 +39,7 @@ import org.springframework.stereotype.Controller;
         private String emailFormatado;
         private String senhaFormatada;
         private String emailExiste;
-        private Boolean irCadas;
-        
+        private Boolean irCadas;        
 
         public boolean questoesLogin() throws InterruptedException {
 
@@ -97,6 +96,7 @@ import org.springframework.stereotype.Controller;
                     validarEmail.validarEmail(emailFormatado);
                     condicaoEmail = validarEmail.getValida();
                     emailExiste = validarEmail.getEmailExiste();
+                    validarEmail.setEmail(email); 
                 } else if (emailFormatado.toUpperCase().equals("CADASTRO")) {
                     senhaFormatada = "CADASTRO";
                     perguntarSenha = false;
@@ -105,7 +105,7 @@ import org.springframework.stereotype.Controller;
                     perguntarSenha = false;
                     break;
                 }
-
+                
                
             }
                 
@@ -227,4 +227,6 @@ import org.springframework.stereotype.Controller;
         );
     }
     
+    
+
 }

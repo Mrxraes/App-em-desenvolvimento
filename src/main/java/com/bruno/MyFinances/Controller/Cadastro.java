@@ -79,7 +79,7 @@ public class Cadastro {
             } else if (emailExiste.equals("0") && condicaoEmail == true) {
                 condicao = condicaoEmail;
             }
-           
+            validarEmail.setEmail(email);
         }
 
         while (condicaoSenha == false && perguntarSenha == true) {
@@ -120,7 +120,7 @@ public class Cadastro {
         if (criarUser.getUserSalvo() == true) {
             cadastroSucedido = true;
             digitar.digitar("Cadastro bem sucedido!");
-            http.IpLogin(request, email.trim().toLowerCase(), "login", nome_primeiro);
+            //http.IpLogin(request, email.trim().toLowerCase(), "login", nome_primeiro);
         }
         return cadastroSucedido;
     }
