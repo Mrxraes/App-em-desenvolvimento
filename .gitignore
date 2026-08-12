@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Aplicação do banco de dados ###
-src/main/resources/application-local.properties
+application.properties

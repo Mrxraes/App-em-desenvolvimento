@@ -1,6 +1,7 @@
 package com.bruno.MyFinances;
 
 import com.bruno.MyFinances.Controller.Cadastro;
+import com.bruno.MyFinances.Controller.EntradaControl;
 import com.bruno.MyFinances.Controller.Login;
 import com.bruno.MyFinances.Controller.SaidaControl;
 import com.bruno.MyFinances.repository.UsuarioRepository;
@@ -19,17 +20,19 @@ public class MyFinancesApplication implements CommandLineRunner {
 	private final Digitacao digitar;
 	private final Login login;
 	private final SaidaControl saida;
+	private final EntradaControl entrada;
 	private final UsuarioRepository repositorio;
 	private final Email email;
 
 	
-	public MyFinancesApplication(Cadastro cadastroRecebido, Digitacao digitacaoRecebida, Login login, SaidaControl saida, UsuarioRepository repositorio, Email email) {
+	public MyFinancesApplication(Cadastro cadastroRecebido, Digitacao digitacaoRecebida, Login login, SaidaControl saida, UsuarioRepository repositorio, Email email, EntradaControl entrada) {
 		this.cadastro = cadastroRecebido; // spring executa o construtor e responde onde fica a classe e atribui a essa constante os metodos que ele carreha
 		this.digitar = digitacaoRecebida;
 		this.login = login;
 		this.saida = saida;
 		this.repositorio = repositorio;
 		this.email = email;
+		this.entrada = entrada;
 	
 	}
 	public static void main(String[] args) {
@@ -38,7 +41,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 
 	public boolean cadastroSucedido;
 	public boolean loginSucedido;
-	public boolean autenticacao;
+	public boolean autenticacao = true;
 	public String id;
 
 
@@ -49,6 +52,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 
 		while (sair == false) {
 			if (autenticacao == true) {
+				email.setEmail("brunoyano52@gmail.com");
 				digitar.digitar("| INTERFACE |");
 				digitar.digitar("| 1 - Registrar uma saída |");
 				digitar.digitar("| 2 - Registrar uma entrada |");
@@ -57,11 +61,25 @@ public class MyFinancesApplication implements CommandLineRunner {
 				String opcao = digitar.ler().toLowerCase().trim();
 				switch (opcao) {
 					case "1":
-						saida.saidas();;
+						saida.saidas();
+						break;
+					case "saida":
+						saida.saidas();
+						break;
+					case "saída":
+						saida.saidas();
 						break;
 					case "2":
+						entrada.entradas();
+						break;
+					case "entrada":
+						entrada.entradas();
 						break;
 					case "3":
+						sair = true;
+						digitar.digitar("| Encerrando o programa |");
+						break;
+					case "sair":
 						sair = true;
 						digitar.digitar("| Encerrando o programa |");
 						break;

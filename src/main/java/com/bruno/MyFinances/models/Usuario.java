@@ -8,8 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate; 
 import java.math.BigDecimal;
 
-
-
 @Entity // --> Selo do JPA que diz ao hibernate o que essa classe é de fato
 public class Usuario {
     @Id

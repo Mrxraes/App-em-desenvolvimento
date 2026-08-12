@@ -4,9 +4,7 @@ import com.bruno.MyFinances.models.Usuario;
 
 import jakarta.transaction.Transactional;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDate;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
