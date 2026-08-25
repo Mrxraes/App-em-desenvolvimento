@@ -24,6 +24,10 @@ public class Saida {
     
     private BigInteger fk_user;
     
+    public Saida() {
+        
+    }
+
     public Saida(String nome, LocalDate registro, String tipo, BigDecimal valor, String obs, BigInteger id) {
         this.nome = nome;
         this.dataRegistro = registro;
@@ -33,5 +37,28 @@ public class Saida {
         this.fk_user = id;
     }
 
+    public String getNome() {
+        return nome;
+    }
+
+    public LocalDate getDataRegistro() {
+        return dataRegistro;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+      public BigDecimal getValor() {
+        return valor;
+    }
+
+    public String getObs() {
+        return obs;
+    }
+
+    public BigInteger getFk() {
+        return fk_user;
+    }
 }
 

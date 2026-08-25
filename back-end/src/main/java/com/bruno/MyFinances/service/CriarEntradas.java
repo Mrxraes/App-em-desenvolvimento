@@ -26,26 +26,5 @@ public class CriarEntradas {
         this.repoEntrada = repoEntrada;
     }
 
-    private boolean sucesso;
-
-    public void criarEntradas(String nome, LocalDate data, BigDecimal valor, String obs, String tipo) {
-        String pegarEmail = email.getEmail();
-        BigInteger fk = repoUsuario.pegarId(pegarEmail);
-        Entrada criar = new Entrada(nome, data, valor, obs, fk, tipo);
-        try {
-            repoEntrada.save(criar);
-            setEntradaSalva(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            setEntradaSalva(false);
-        }
-    }
-
-    public void setEntradaSalva(boolean salvo) {
-        sucesso = salvo;
-    }
-
-    public boolean getEntradaSalva() {
-        return sucesso;
-    }
+   
 }

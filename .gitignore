@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### Aplicação do banco de dados ###
-src/main/resources/application.properties
+back-end/src/main/resources/application.properties

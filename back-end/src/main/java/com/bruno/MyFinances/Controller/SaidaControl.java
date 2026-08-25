@@ -4,24 +4,72 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 
+import com.bruno.MyFinances.service.ServiceGasto;
 import com.bruno.MyFinances.service.CriarSaida;
 import com.bruno.MyFinances.service.Digitacao;
 
 @Controller
 public class SaidaControl {
+
     private final Digitacao digitar;
     private final CriarSaida criarSaidaMet;
+    private final ServiceGasto gasto;
 
-    public SaidaControl(Digitacao digitacao,  CriarSaida criarSaidaMet) {
+    public SaidaControl(Digitacao digitacao,  CriarSaida criarSaidaMet, ServiceGasto gasto) {
         this.digitar = digitacao;
         this.criarSaidaMet = criarSaidaMet;
+        this.gasto = gasto;
     }
     
-
     public void saidas() throws InterruptedException {
+        boolean sair = false;
+        while (sair == false) {
+            digitar.digitar("| INTERFACE DE SAIDAS |");
+            digitar.digitar("| 1 - Registrar saidas |");
+            digitar.digitar("| 2 - Ver gasto mensal |");
+            digitar.digitar("| 3 - Ver todos os gastos do mês |");
+            digitar.digitar("| 4 - Sair |");
+            String opcao = digitar.ler().trim();
+            switch (opcao) {
+                case "1":
+                    registrarSaidas();
+                    break;
+                case "2":
+                    consultarGasto();
+                    break;
+                case "3":
+                    verTotGastos();
+                    break;
+                case "4":
+                    sair = true;
+                    break;
+            }
+        }
+    }
+
+    public void verTotGastos() throws InterruptedException {
+        gasto.todosGastos();
+    }
+
+    public void consultarGasto() throws InterruptedException {
+        List<BigDecimal> soma = gasto.gastoTotal();
+        String valorFixo = String.valueOf(soma.get(0));
+        String valorVariavel = String.valueOf(soma.get(1));
+        String valorInvestimentos = String.valueOf(soma.get(2));
+        String valorTotal = String.valueOf(soma.get(3));
+        digitar.digitar("| GASTO MENSAL |");
+        digitar.digitar("| SAIDAS FIXAS: R$" + valorFixo + " |");
+        digitar.digitar("| SAIDAS VARIÁVEIS: R$" + valorVariavel + " |");
+        digitar.digitar("| SAIDAS VARIÁVEIS: R$" + valorInvestimentos + " |");
+        digitar.digitar("| VALOR TOTAL: R$" + valorTotal + " |");
+
+    }
+
+    public void registrarSaidas() throws InterruptedException {
 
     String nome = null;
     LocalDate data = null;
@@ -119,13 +167,13 @@ public class SaidaControl {
                     digitar.digitar("Qual o valor dessa saída?");
                     String valorText = digitar.ler();
                     
-                    if (valorText.matches("\\d+")) {
-                        valor = new BigDecimal(valorText);
+                    if (valorText.matches("\\\\d+([,.]\\d{1,2})?")) {
+                        valor = new BigDecimal(valorText.replace(",", "."));
                         valorCerto = true;
                     } else if (valorText.equals("VOLTAR")) {
                         sair = true;
                         break;
-                    } else if (!valorText.matches("\\d+")) {
+                    } else if (!valorText.matches("\\d+([,.]\\d{1,2})?")) {
                         digitar.digitar("| Digite apenas números. |");
                     } else {
                         digitar.digitar("| OPÇÃO INVÁLIDA |");

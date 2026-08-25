@@ -18,6 +18,10 @@ public class Entrada {
     private String obs;
     private BigInteger fk_user;
 
+    public Entrada() {
+        
+    }
+
     public Entrada(String nome, LocalDate data, BigDecimal valor, String obs, BigInteger id, String tipo) {
         this.nome = nome;
         this.dataRegistro = data;
@@ -25,6 +29,30 @@ public class Entrada {
         this.obs = obs;
         this.fk_user = id;
         this.tipo = tipo;
+    }
+
+     public String getNome() {
+        return nome;
+    }
+
+    public LocalDate getDataRegistro() {
+        return dataRegistro;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+      public BigDecimal getValor() {
+        return valor;
+    }
+
+    public String getObs() {
+        return obs;
+    }
+
+    public BigInteger getFk() {
+        return fk_user;
     }
 
 }
