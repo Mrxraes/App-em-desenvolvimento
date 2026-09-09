@@ -1,60 +1,68 @@
 package com.bruno.MyFinances.Controller;
 import com.bruno.MyFinances.repository.UsuarioRepository;
+import com.bruno.MyFinances.service.Codigo;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
+import com.bruno.MyFinances.service.EnviarEmail;
 import com.bruno.MyFinances.service.Password;
 import com.bruno.MyFinances.service.PasswordCripto;
-
+import com.bruno.MyFinances.dto.LoginRequest;
+import com.bruno.MyFinances.dto.LoginResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-import org.springframework.stereotype.Controller;
 
 
-
-    @Controller //spring cria essa classe
+    @RestController
+    @RequestMapping("/api") // cria a porta de entrada para a classe e informa que é uma API
     public class Login {
 
-        private final Digitacao digitar;
         private final Email validarEmail;
         private final Password validarSenha;
         private final PasswordCripto senhaMatch;
-        private final UsuarioRepository repositorio;
-        private final BuscarIP http;
-        private final HttpServletRequest request;
+   
 
-        public Login(Digitacao digitarRecebido, Email validarEmail, Password validarSenha,  PasswordCripto senhaMatch, UsuarioRepository repositorio, BuscarIP http, HttpServletRequest request) {
-            this.digitar = digitarRecebido;
+
+        public Login(Email validarEmail, Password validarSenha,  PasswordCripto senhaMatch) {
             this.validarEmail = validarEmail;
             this.validarSenha = validarSenha;
             this.senhaMatch = senhaMatch;
-            this.repositorio = repositorio;
-            this.http = http;
-            this.request = request;
         }
 
         private String email;
         private String senha;
         private String emailFormatado;
         private String senhaFormatada;
-        private Boolean irCadas;
         private String emailExiste;
-        
+        private String mensagem;
+        private boolean passarPag;
+        private boolean senhaIguais;
+        private LocalDateTime criado;
 
-        public boolean questoesLogin() throws InterruptedException {
-            boolean loginLoop = true;
-            setIrCadas(false);  
-            boolean loginSucedido = false;
+        
+        @PostMapping("/login")   
+        public LoginResponse questoesLogin(@RequestBody LoginRequest request) throws InterruptedException {
+            email = "";
+            senha = "";
+            mensagem = "";
+            passarPag = false;
+            senhaIguais = false;
+            System.out.println(email + " 1 " + senha);
             Integer tentativasLogin = 0;
             ArrayList<String> emails = new ArrayList<>();
             ArrayList<Boolean> iguais = new ArrayList<>();
         try 
         {
+        System.out.println(email + " 2 " + senha);
 
-            while (loginLoop == true) {
 
-                if (tentativasLogin >= 5) {
+            if (tentativasLogin >= 5) {
                     boolean deveParar = false;
                     boolean loopExec = false;
 
@@ -68,122 +76,85 @@ import org.springframework.stereotype.Controller;
                     if (iguais.get(0) == true && iguais.get(1) == true && iguais.get(2) == true && iguais.get(3) == true) {
                         deveParar = true;
                         if (deveParar == true) {
-                        digitar.digitar("Número de tentativas de login excedida, tente novamente.");
-                        break;
+                        mensagem = "Número de tentativas de login excedida, tente novamente.";
                         } 
                     } else if (deveParar == false) {
-                        System.out.println("Continua para nao");
-                        continue;
                     }
                 }
                
             } else {
 
-                boolean perguntarSenha = true;
                 boolean condicaoSenha = false;
                 boolean condicaoEmail = false;
-                boolean senhaIguais = false;
-                boolean donoEmail = false;
-                boolean executarCondicional = true;
+ 
+                email = request.getEmail();
+                emailFormatado = email.trim().toLowerCase();
+                validarEmail.validarEmail(emailFormatado);
+                condicaoEmail = validarEmail.getValida();
+                System.out.println(condicaoEmail);
+                if (condicaoEmail == false) {
+                    mensagem = validarEmail.getMensagem();
+                    System.out.println(mensagem);
 
-                digitar.digitar("| LOGIN |");
-                digitar.digitar("| Caso deseje fazer o cadastro, digite 'CADASTRO' |");
-                digitar.digitar("| Caso deseje redefinir a senha, digite 'REDEFINIR' |");
-
-                while (condicaoEmail == false) {
-                    digiteEmail();
-                    
-                    if (emailFormatado.equalsIgnoreCase("CADASTRO")) {
-                        senhaFormatada = "CADASTRO";
-                        System.out.println("Cai aqui");
-                        setEmailLogin("CADASTRO");
-                        perguntarSenha = false;
-                        break;
-                    } else if (emailFormatado.equalsIgnoreCase("REDEFINIR")) {              
-                        perguntarSenha = false;
-                        setEmailLogin("voltar");
-                        break;
-                    }  else {
-                        validarEmail.validarEmail(emailFormatado);
-                        condicaoEmail = validarEmail.getValida();
-                        setEmailLogin(validarEmail.getEmailExiste());
-                        validarEmail.setEmail(email); 
-                    }      
                 }
-
-                while (perguntarSenha == true) {
-                    digiteSenha(); 
-                        if (senhaFormatada.equalsIgnoreCase("CADASTRO")) {
-                            perguntarSenha = false;
-                            break;
-                        } else if (senhaFormatada.equalsIgnoreCase("REDEFINIR")) {
-                            perguntarSenha = false;
-                            break;
-                        } else if (!senhaFormatada.equalsIgnoreCase("CADASTRO")) {
-                            condicaoSenha = validarSenha.validaSenha(senhaFormatada);
-                            if (condicaoSenha == true && emailExiste.equals("1")) {
-                                senhaIguais = senhaMatch.macthSenha(senhaFormatada, emailFormatado); 
-                                perguntarSenha = false;
-                            } else if (condicaoSenha == true && emailExiste.equals("0")) {
-                                perguntarSenha = false;
-                            } 
-                        }
-                }
-
-                ///////
-                if (emailFormatado.equalsIgnoreCase("CADASTRO") || senhaFormatada.equalsIgnoreCase("CADASTRO")) {
-                    setIrCadas(true);
-                    loginLoop = false;
-                } else {
-                    setIrCadas(false);
-                }
+                setEmailLogin(validarEmail.getEmailExiste());
+                validarEmail.setEmail(emailFormatado); 
                 
-                if (emailFormatado.equalsIgnoreCase("REDEFINIR") || senhaFormatada.equalsIgnoreCase("REDEFINIR")) {
-                    redefinicao();
-                    executarCondicional = false;
-                }
-                ///////
+            
 
-                //////
-                if (getEmailLogin().equals("1") && senhaIguais == true) 
-                {
-                    String primeiro_nome = repositorio.consultarNome(email);
-                    donoEmail = validarEmail.emailAutenticacao(emailFormatado, "login", primeiro_nome); 
-                    if (donoEmail == true)  {
-                        digitar.digitar("Login bem sucedido!");
-                        loginSucedido = true;
-                        http.IpLogin(request, emailFormatado, "login", primeiro_nome);
-                        return true;
-                    } 
+        
+                senha = request.getSenha();
+                senhaFormatada = senha.trim();
+                condicaoSenha = validarSenha.validaSenha(senhaFormatada);
+                if (condicaoSenha == true && emailExiste.equals("1")) {
+                    senhaIguais = senhaMatch.macthSenha(senhaFormatada, emailFormatado); 
                 } 
-                else if ((getEmailLogin().equals("0") || senhaIguais == false) && (!getEmailLogin().equalsIgnoreCase("CADASTRO") && !senhaFormatada.equalsIgnoreCase("CADASTRO")) && (executarCondicional == true) && (!emailFormatado.equalsIgnoreCase("REDEFINIR") && !senhaFormatada.equalsIgnoreCase("REDEFINIR"))) 
+                if (condicaoSenha == false) {
+                    mensagem += "\n" + validarSenha.getMensagem();
+                }
+            
+                System.out.println(senhaIguais);
+                String ver = getEmailLogin();
+                System.out.println(ver);
+
+                // Cuida da passagem para página de verificação
+                if (emailExiste.equals("1") && senhaIguais == true) {
+                    passarPag = true;
+                    System.out.println(passarPag);
+                } else if (emailFormatado.isEmpty() || senhaFormatada.isEmpty()) {
+                    mensagem = "E-mail e senha não podem ser vazios."; // resposta pra la
+                } else if (condicaoSenha == false) {
+                    mensagem = validarSenha.getMensagem();
+                } else if (emailExiste.equals("0") || senhaIguais == false || condicaoEmail == false || condicaoSenha == false )
                 {
-                    digitar.digitar("A senha está incorreta ou o email não corresponde.");
+                    mensagem = "A senha está incorreta ou o e-mail não corresponde."; // resposta pra la
+                    System.out.println(mensagem);
+                    passarPag = false;
                     tentativasLogin += 1;
                     emails.add(emailFormatado);
                 }
-                else if ((getEmailLogin().equals("0") || senhaIguais == false) && (!emailFormatado.equalsIgnoreCase("CADASTRO") && !senhaFormatada.equalsIgnoreCase("CADASTRO"))) 
-                {
-                    digitar.digitar("Digite 'REDEFINIR' para a recuperação da sua senha ou 'TENTAR' para tentar novamente.");
-                    String decisao = digitar.ler().trim();
-                        if (decisao.equalsIgnoreCase("TENTAR")) {
-                            continue;
-                        } else if (decisao.equalsIgnoreCase("REDEFINIR")) {
-                            redefinicao(); 
-                            continue;
-                        }
-                    } 
-                    //////
-                } 
+                // Cuida da passagem para a página de verificação
+    
+                
+                
+
             }
+        
         } catch (InterruptedException e) 
                 {
+                    System.out.println(email + " 3 " + senha);
                     e.printStackTrace();
-                }   
-        return loginSucedido;
+                }
+                
+        System.out.println(email + " 4 " + senha);
+        System.out.println(passarPag);
+        return new LoginResponse(
+            passarPag,
+            mensagem
+        );
     }
 
-        public void digiteEmail() throws InterruptedException 
+        /*public void digiteEmail() throws InterruptedException 
         {
             digitar.digitar("Qual o seu endereço de email? "); 
             email = digitar.ler();;
@@ -194,15 +165,15 @@ import org.springframework.stereotype.Controller;
         {
             digitar.digitar("Digite a sua senha: "); 
             senha = digitar.ler();
-            senhaFormatada = senha.trim();
+            senhaFormatada = email.trim().toLowerCase();
+        } */
+
+        public String getEmailFormatado() {
+            return emailFormatado;
         }
 
-        public void setIrCadas(Boolean valor) {
-            irCadas = valor;
-        } 
-
-        public boolean getIrCadas() {
-            return irCadas;
+        public String getSenhaFormatada() {
+            return senhaFormatada;
         }
         
         public void setEmailLogin(String emailExiste) {
@@ -213,6 +184,19 @@ import org.springframework.stereotype.Controller;
             return emailExiste;
         }
 
+        public boolean getSenhasIguais() {
+            return senhaIguais;
+        }
+
+        public void setCodeHora(LocalDateTime code) {
+            this.criado = code;
+        }
+
+        public LocalDateTime getCodeHora() {
+            return criado;
+        }
+
+/*
         public void redefinicao() throws InterruptedException {
             //boolean redefinicao = false;
             digiteEmail();
@@ -224,11 +208,6 @@ import org.springframework.stereotype.Controller;
                     digitar.digitar("Alteração de senha bem sucedida, faça login para continuar.");
                     //redefinicao = true;
                 } 
+*/
          //return redefinicao;
         }
-       
-    }
-    
-    
-
-}

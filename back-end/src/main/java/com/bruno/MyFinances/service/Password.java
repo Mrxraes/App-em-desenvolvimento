@@ -29,6 +29,9 @@
         
         } */
 
+        private String mensagemParam;
+        private String mensagem;
+
         public boolean validaSenha(String senha, String senhaConfirm) throws InterruptedException {
             boolean maiuscula = false;
             boolean minuscula = false;
@@ -38,11 +41,11 @@
             boolean valida = true;
 
             if (!senha.equals(senhaConfirm)) {
-                digitar.digitar("As senhas não coincidem.");
+                mensagemParam = "As senhas não coincidem.";
                 valida = false;
             }
             if (senha.length() < 8 || senha.length() > 64) {
-                digitar.digitar("A senha deve ter no minímo 8 caracteres e no máximo 64.");
+                mensagemParam = "A senha deve ter no minímo 8 caracteres e no máximo 64.";
                 valida = false;
             }
 
@@ -61,9 +64,10 @@
             }
 
             if (maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) {
-                digitar.digitar("A senha deve conter ao menos 1 caractere maiúsculo, 1 caractere minúsuculo, 1 número e 1 especial. Não pode haver espaços.");
+                mensagemParam = "A senha deve ter maiúscula, minúscula, número e caractere especial, sem espaços.";
                 valida = false;
             }
+            setMensagem(mensagemParam);
             return valida;
         }
 
@@ -76,7 +80,7 @@
             boolean valida = true;
 
             if (senha.length() < 8 || senha.length() > 64) {
-                digitar.digitar("A senha deve ter no minímo 8 caracteres e no máximo 64.");
+                mensagemParam = "A senha deve ter no minímo 8 caracteres e no máximo 64.";
                 valida = false;
             }
 
@@ -95,15 +99,26 @@
             }
 
             if (maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) {
-                digitar.digitar("A senha deve conter ao menos 1 caractere maiúsculo, 1 caractere minúsuculo, 1 número e 1 especial. Não pode haver espaços.");
+                mensagemParam = "A senha deve ter maiúscula, minúscula, número, caractere especial, sem espaços e de 8 à 64 caracteres.";
                 valida = false;
             }
+            setMensagem(mensagemParam);
             return valida;
         }
 
+
+        public void setMensagem(String msg) {
+            this.mensagem = msg;
+        }
+
+        public String getMensagem() {
+            return this.mensagem;
+        }
+
+        
         private String senha1;
         private String senha2;
-
+/*
         public boolean redefinirSenha(String email, String nome) throws InterruptedException {
             boolean redefinicaoSucedida = false;
             boolean valido = this.email.emailAutenticacao(email, "restabelecimento", nome);  
@@ -124,10 +139,10 @@
                     }
                 }
             }
-
+ 
         return redefinicaoSucedida;
     }
-
+*/
     public void digiteSenha() throws InterruptedException 
     {
         digitar.digitar("Digite a sua senha: "); 

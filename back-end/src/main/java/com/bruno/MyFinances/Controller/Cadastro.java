@@ -186,7 +186,7 @@ public class Cadastro {
 
                 if (sair == false) {
                     String senhaHash = criptografarSenha.criptografiaSenha().encode(senha);
-                    donoEmail = validarEmail.emailAutenticacao(email.trim().toLowerCase(), "cadastro", nome_primeiro);
+                    //donoEmail = validarEmail.emailAutenticacao(email.trim().toLowerCase(), "cadastro", nome_primeiro);
                         if (donoEmail == false) {
                             perguntarSenha = false;
                         } else if (donoEmail == true) {

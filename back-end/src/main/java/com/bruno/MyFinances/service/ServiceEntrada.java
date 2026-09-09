@@ -10,9 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.bruno.MyFinances.models.Entrada;
-import com.bruno.MyFinances.models.Saida;
 import com.bruno.MyFinances.repository.EntradaRepository;
-import com.bruno.MyFinances.repository.SaidaRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
 @Service

@@ -8,13 +8,12 @@ import com.bruno.MyFinances.repository.UsuarioRepository;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
 
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication // importa a funcionalidade do spring e declara aqui
-public class MyFinancesApplication implements CommandLineRunner {
+public class MyFinancesApplication {
 
 	private final Cadastro cadastro;
 	private final Digitacao digitar;
@@ -38,7 +37,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(MyFinancesApplication.class, args); // cerebro do spring, ele captaliza todas as marcações
 	}
-
+/* 
 	public boolean cadastroSucedido;
 	public boolean loginSucedido;
 	public boolean autenticacao = true;
@@ -74,7 +73,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 					while (autenticacao == false && menuInicio == false) {
 						String emailExisteCadastro;
 							if (decisao.equals("1")) {
-								loginSucedido = login.questoesLogin();
+								//loginSucedido = login.questoesLogin();
 								boolean irCadastro = login.getIrCadas();
 									if (irCadastro) {
 										decisao = "2";
@@ -158,5 +157,7 @@ public class MyFinancesApplication implements CommandLineRunner {
 
 			}
 		}
+			
 	}
+		*/
 }

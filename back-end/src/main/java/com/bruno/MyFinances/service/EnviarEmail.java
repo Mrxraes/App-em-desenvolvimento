@@ -26,7 +26,7 @@ public class EnviarEmail {
         mensagem.setTo(email);
         mensagem.setSubject("Seu código de verificação");
         mensagem.setText("Olá " + nome + ", aqui segue seu código de verificação do seu email para a conclusão do seu " + cadasOuLogin + ": " + codigo);
-        mensagem.setFrom("My Finances <myfinancesdoisfatores@gmail.com2>"); /*O spring ja preenche automaticamente entao o set from, ah nao ser que eu faça a autenticação no servidor de protocolo e use outro email para enviar email ou queria deixar o nome mais bonito*/
+        mensagem.setFrom("My Finances <myfinancesdoisfatores@gmail.com>"); /*O spring ja preenche automaticamente entao o set from, ah nao ser que eu faça a autenticação no servidor de protocolo e use outro email para enviar email ou queria deixar o nome mais bonito*/
         this.email.send(mensagem);
     }
 

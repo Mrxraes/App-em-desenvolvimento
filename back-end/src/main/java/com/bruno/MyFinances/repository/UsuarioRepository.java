@@ -5,6 +5,8 @@ import com.bruno.MyFinances.models.Usuario;
 import jakarta.transaction.Transactional;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -38,15 +40,15 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Modifying // Informa ao spring que isso faz uma modificação no banco de dados e não é apenas um select
     @Transactional // Se a operação nao ocorrer da forma correta ele corta tudo
     @Query(value = """
-            INSERT INTO codigoTemporario (cod) VALUES (:codigo)
+            INSERT INTO codigoTemporario (cod, dataCriada) VALUES (:codigo, :dataCriada)
             """, nativeQuery = true)  
-    int inserirCod(@Param("codigo") String codigo); 
+    int inserirCod(@Param("codigo") String codigo,  @Param("dataCriada") LocalDate dataCriada); 
 
     // PEGA O CODIGO DESSA TABELA
     @Query(value = """
-            SELECT cod FROM codigoTemporario WHERE cod = :codigo
+            SELECT cod FROM codigoTemporario WHERE cod = :codigo AND dataCriada = :dataCriada
             """, nativeQuery = true)  
-    String pegarCod(@Param("codigo") String codigo); 
+    String pegarCod(@Param("codigo") String codigo, @Param("dataCriada") LocalDate dataCriada); 
 
     @Modifying // Informa ao spring que isso faz uma modificação no banco de dados e não é apenas um select
     @Transactional // Se a operação nao ocorrer da forma correta ele corta tudo

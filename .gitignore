@@ -34,3 +34,4 @@ build/
 
 ### Aplicação do banco de dados ###
 back-end/src/main/resources/application.properties
+node_modules

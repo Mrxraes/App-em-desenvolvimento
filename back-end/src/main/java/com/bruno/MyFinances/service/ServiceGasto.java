@@ -17,14 +17,10 @@ import com.bruno.MyFinances.repository.UsuarioRepository;
 public class ServiceGasto {
 
     private final SaidaRepository repoSaida;
-    private final UsuarioRepository repositorio;
-    private final Email existeEmail;
     private final Digitacao digitar;
 
-    public ServiceGasto(SaidaRepository repoSaida, UsuarioRepository repositorio, Email existeEmail, Digitacao digitar) {
+    public ServiceGasto(SaidaRepository repoSaida, Digitacao digitar) {
         this.repoSaida = repoSaida;
-        this.repositorio = repositorio;
-        this.existeEmail = existeEmail;
         this.digitar = digitar;
     }
 

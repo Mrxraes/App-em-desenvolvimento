@@ -2,9 +2,9 @@ import {Stack} from 'expo-router';
 
 export default function redirecionamentoAuth() {
   return (
-    <Stack initialRouteName="(auth)">
+    <Stack initialRouteName="login">
       <Stack.Screen
-        name = "(auth)"
+        name = "login"
         options = {{headerShown: false}}
       />
 
