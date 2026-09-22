@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.bruno.MyFinances.models.Saida;
+import com.bruno.MyFinances.models.Usuario;
 import com.bruno.MyFinances.repository.SaidaRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
@@ -32,7 +33,7 @@ public class CriarSaida {
 
     public void criarSaidas(String nome, LocalDate data, String tipo, BigDecimal valor, String obs) {
         String pegarEmail = email.getEmail();
-	    BigInteger fk = repoUsuario.pegarId(pegarEmail);
+	    Long fk = repoUsuario.pegarId(pegarEmail);
         Saida criar = new Saida(nome, data, tipo, valor, obs, fk);
             try {
                 repoSaida.save(criar);

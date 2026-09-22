@@ -16,13 +16,13 @@ public class Entrada {
     private String tipo;
     private BigDecimal valor;
     private String obs;
-    private BigInteger fk_user;
+    private Long fk_user;
 
     public Entrada() {
         
     }
 
-    public Entrada(String nome, LocalDate data, BigDecimal valor, String obs, BigInteger id, String tipo) {
+    public Entrada(String nome, LocalDate data, BigDecimal valor, String obs, Long id, String tipo) {
         this.nome = nome;
         this.dataRegistro = data;
         this.valor = valor;
@@ -51,7 +51,7 @@ public class Entrada {
         return obs;
     }
 
-    public BigInteger getFk() {
+    public Long getFk() {
         return fk_user;
     }
 

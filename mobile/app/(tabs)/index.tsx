@@ -1,11 +1,10 @@
+import { Redirect } from 'expo-router';
 import { StyleSheet,Text, View } from 'react-native'
 
 export default function HomeScreen() {
   return (
-    <View style={styles.container}>
-      <Text>Início</Text>  
-    </View>
-  );
+    <Text>Inicio</Text>
+  )
 }
 
 const styles = StyleSheet.create({

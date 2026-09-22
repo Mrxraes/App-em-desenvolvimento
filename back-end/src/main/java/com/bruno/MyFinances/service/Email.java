@@ -24,12 +24,14 @@ public class Email {
     private boolean valida;
     private String emailExistente;
     private String emailRun;
+    private Boolean perfilAtivo;
 
-    public void resultado(boolean valida, String existe, String mensagem) {
+    public void resultado(boolean valida, String existe, String mensagem, Boolean perfilAtivo) {
         this.valida = valida;
         this.emailExistente = existe;
         this.mensagem = mensagem;
-        }
+        this.perfilAtivo = perfilAtivo;
+    }
 
     public boolean getValida() {
         return valida;
@@ -43,6 +45,11 @@ public class Email {
         return mensagem;
     }
 
+    public boolean getAtivo() {
+        return perfilAtivo;
+    }
+
+
     public void validarEmail(String email) throws InterruptedException
     {
         boolean espaco = false;
@@ -53,17 +60,31 @@ public class Email {
         int indice = email.length() - 1;
 
         String existeEmail = existe.existeEmail(email);
-
+        System.out.println(existeEmail);
 
         if (!email.isEmpty()) {
             if (email.charAt(0) == '@' || email.charAt(indice) == '@') {
-                mensagemParam = "O email não pode possuir o caracter '@' no inicío ou no fim.";
+                mensagemParam = "O e-mail não pode possuir o caracter '@' no inicío ou no fim.";
                 valida = false;
             } 
             if (email.contains("@.") || email.charAt(indice) == '.' || email.contains("..")) {
-                mensagemParam = "O email não pode possuir o caracter '.' no inicío ou no fim do dominio ou de forma consecutiva.";
+                mensagemParam = "O e-mail não pode possuir o caracter '.' no inicío, no fim do dominio ou de forma consecutiva.";
                 valida = false;
             }
+            String emailSemCom = email.replace(".com", "");
+            if (emailSemCom.length() <= 3) {
+                mensagemParam = "O e-mail não pode possuir mais de três caracteres antes de '.com'.";
+                valida = false;
+            } 
+            int antesDoArroba = email.indexOf("@");  
+            if (antesDoArroba > 63) {
+                mensagemParam = "O e-mail não pode possuir mais de 64 caracteres antes de '@'.";
+                valida = false;
+            } 
+            if (email.length() > 254) {
+                mensagemParam = "O e-mail não pode possuir mais de 254 caracteres.";
+                valida = false;
+            } 
                   
             for (char c : email.toCharArray()) {
                     if (Character.isWhitespace(c)) {
@@ -81,11 +102,11 @@ public class Email {
 
             if (espaco == true) {
                 valida = false;
-                mensagemParam = "O email não pode possuir espaços";
+                mensagemParam = "O e-mail não pode possuir espaços";
             } else if (contaArroba > 1 || contaArroba == 0) {
                 //System.out.println(contaArroba);
                 valida = false;
-                mensagemParam = "O email deve possuir 1 caracter '@' ";
+                mensagemParam = "O e-mail deve possuir um caracter '@' ";
             } else if (pontoDpsArroba == false) {
                 valida = false;
                 mensagemParam = "O tipo de dominio é inválido.";
@@ -95,7 +116,10 @@ public class Email {
             valida = false;
             mensagemParam = "Email não pode ser nulo";
         }
-                resultado(valida, existeEmail, mensagemParam);
+
+        perfilAtivo = existe.pegarAtivo(email);
+
+                resultado(valida, existeEmail, mensagemParam, perfilAtivo);
 }
 //request.getCodigo() -- Entender esse codigo e corrijir para que receba e valide o codigo, o envio deve ficar responsavel pelo LOGIN
    

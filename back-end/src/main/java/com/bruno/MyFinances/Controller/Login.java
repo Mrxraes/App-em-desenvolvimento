@@ -154,20 +154,6 @@ import java.util.ArrayList;
         );
     }
 
-        /*public void digiteEmail() throws InterruptedException 
-        {
-            digitar.digitar("Qual o seu endereço de email? "); 
-            email = digitar.ler();;
-            emailFormatado = email.trim().toLowerCase();
-        }
-
-        public void digiteSenha() throws InterruptedException 
-        {
-            digitar.digitar("Digite a sua senha: "); 
-            senha = digitar.ler();
-            senhaFormatada = email.trim().toLowerCase();
-        } */
-
         public String getEmailFormatado() {
             return emailFormatado;
         }

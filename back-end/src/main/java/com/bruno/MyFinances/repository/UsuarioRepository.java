@@ -67,5 +67,19 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query(value = """
             SELECT id FROM usuario WHERE email = :email
             """, nativeQuery = true)
-        BigInteger pegarId(@Param("email") String email);
+        Long pegarId(@Param("email") String email);
+
+    
+    @Modifying // tudo que altera no banco de dados precisa disso, e não pode retornar string
+    @Transactional
+    @Query(value = """ 
+        UPDATE usuario SET ativo = 1 WHERE id = :id;    
+        """, nativeQuery = true)
+        int usuarioAtivo(@Param("id") Long id);
+
+    @Query(value = """
+            SELECT ativo FROM usuario  WHERE email = :email; 
+            """, nativeQuery = true)
+    Boolean pegarAtivo(@Param("email") String email);
+
 }

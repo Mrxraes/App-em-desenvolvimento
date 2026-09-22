@@ -31,6 +31,7 @@ public class Autenticacao {
     
     private String mensagem;
     private boolean loginSucedido;
+    private boolean perfilAtivo;
     
     @PostMapping("/validarEmail")
     public ValidationResponse validarEmail(@RequestBody ValidationRequest request) throws InterruptedException {
@@ -39,7 +40,8 @@ public class Autenticacao {
         cod.verificarCod(codigoInput, criado);
         loginSucedido = cod.getLoginSucedido();
         mensagem = cod.getMensagem();
-        return new ValidationResponse(loginSucedido, mensagem);
+        perfilAtivo = cod.getPerfilAtivo();
+        return new ValidationResponse(loginSucedido, mensagem, perfilAtivo);
     } 
 
     @PostMapping("/enviarEmailAutenticacao")
@@ -48,16 +50,16 @@ public class Autenticacao {
         String emailFormatado = loginDados.getEmailFormatado();
         String emailExiste = loginDados.getEmailLogin();
         Boolean senhaIguais = loginDados.getSenhasIguais();
-        if (emailExiste.equals("1") && senhaIguais == true) {
-            String primeiro_nome = repositorio.consultarNome(emailFormatado);
-            String codigo = cod.criarCod();
-            LocalDateTime criadoHora = LocalDateTime.now();
-            repositorio.inserirCod(codigo, criadoHora.toLocalDate());
-            System.out.println(criadoHora);
-            loginDados.setCodeHora(criadoHora); 
-            enviarEmail.enviarEmailAutenticacao(codigo, emailFormatado, "login", primeiro_nome);
-        } else {
-            System.out.println("Algo fora dos padrões aconteceu.");
-        }
+            if (emailExiste.equals("1") && senhaIguais == true) {
+                String primeiro_nome = repositorio.consultarNome(emailFormatado);
+                String codigo = cod.criarCod();
+                LocalDateTime criadoHora = LocalDateTime.now();
+                repositorio.inserirCod(codigo, criadoHora.toLocalDate());
+                System.out.println(criadoHora);
+                loginDados.setCodeHora(criadoHora); 
+                enviarEmail.enviarEmailAutenticacao(codigo, emailFormatado, "login", primeiro_nome);
+            } else {
+                System.out.println("Algo fora dos padrões aconteceu.");
+            }
     }
 }

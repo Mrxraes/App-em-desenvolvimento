@@ -2,21 +2,30 @@ import {Stack} from 'expo-router';
 
 export default function redirecionamentoAuth() {
   return (
-    <Stack initialRouteName="login">
+    <Stack initialRouteName="login" screenOptions={{
+      headerShown: false
+    }}>
       <Stack.Screen
         name = "login"
-        options = {{headerShown: false}}
+      />
+      
+      <Stack.Screen
+        name = "redefinir-senha"
       />
 
       <Stack.Screen
-        name = "(tabs)"
-        options = {{headerShown: false}}
+        name = "solicitarRedefinicao"
       />
 
       <Stack.Screen
-        name = "modal"
-        options = {{headerShown: false}}
+        name = "verificacaoEmail"
       />
+
+      <Stack.Screen
+        name = "cadastro"
+      />
+
+
     </Stack>
   )
 }

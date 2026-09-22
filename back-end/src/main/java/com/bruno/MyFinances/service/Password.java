@@ -2,23 +2,23 @@
     import java.util.Scanner;
 
     import org.springframework.stereotype.Service;
-    
-    import com.bruno.MyFinances.repository.UsuarioRepository;
+
+import com.bruno.MyFinances.repository.TokenRedefinirSenhaRepository;
+import com.bruno.MyFinances.repository.UsuarioRepository;
 
     @Service
     public class Password {
         public Scanner ler = new Scanner(System.in);
 
-        private final Digitacao digitar;
-        private final Email email;
+       
         private final UsuarioRepository repositorio;
         private final PasswordCripto criptografarSenha;
+        private final TokenRedefinirSenhaRepository tokenRepositorio;
 
-        public Password(Digitacao digitacaoRecebida, Email email, UsuarioRepository repositorio, PasswordCripto criptografarSenha) {
-            this.digitar = digitacaoRecebida;
-            this.email = email;
+        public Password( UsuarioRepository repositorio, PasswordCripto criptografarSenha,TokenRedefinirSenhaRepository tokenRepositorio) {
             this.repositorio = repositorio;
             this.criptografarSenha = criptografarSenha;
+            this.tokenRepositorio = tokenRepositorio;
         }
 
         /*public static void confirmarSenha(String senha, String senhaConfirm) throws InterruptedException {
@@ -29,26 +29,40 @@
         
         } */
 
-        private String mensagemParam;
         private String mensagem;
 
         public boolean validaSenha(String senha, String senhaConfirm) throws InterruptedException {
+            String mensagemParam = "";
+            System.out.println("Estamos aqui");
+            System.out.println(senha);
+            System.out.println(senhaConfirm);
             boolean maiuscula = false;
             boolean minuscula = false;
             boolean especial = false;
             boolean algarismo = false;
             boolean espaco = false;
             boolean valida = true;
+            boolean verificar = true;
 
-            if (!senha.equals(senhaConfirm)) {
+            if ((senha == null || senhaConfirm == null || senha.isEmpty() || senhaConfirm.isEmpty()) && verificar == true) {
+                mensagemParam = "A senha não pode ser vazia.";
+                System.out.println(mensagemParam);
+                valida = false; 
+                verificar = false;
+            }
+            if (!senha.equals(senhaConfirm) && verificar == true) {
                 mensagemParam = "As senhas não coincidem.";
+                System.out.println(mensagemParam);
                 valida = false;
+                verificar = false;
             }
-            if (senha.length() < 8 || senha.length() > 64) {
+            if ((senha.length() < 8 || senha.length() > 64) && verificar == true) {
                 mensagemParam = "A senha deve ter no minímo 8 caracteres e no máximo 64.";
+                System.out.println(mensagemParam);
                 valida = false;
+                verificar = false;
             }
-
+        
             for (char c : senha.toCharArray()) {
                 if (Character.isUpperCase(c)) {
                     maiuscula = true;
@@ -63,25 +77,37 @@
                 }
             }
 
-            if (maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) {
+            if ((maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) && verificar == true) {
                 mensagemParam = "A senha deve ter maiúscula, minúscula, número e caractere especial, sem espaços.";
+                System.out.println(mensagemParam);
                 valida = false;
+                verificar = false;
             }
             setMensagem(mensagemParam);
+            System.out.println("Antes de retornar: " + mensagemParam);
             return valida;
         }
 
         public boolean validaSenha(String senha) throws InterruptedException {
+            String mensagemParam = "";
             boolean maiuscula = false;
             boolean minuscula = false;
             boolean especial = false;
             boolean algarismo = false;
             boolean espaco = false;
             boolean valida = true;
+            boolean verificar = true;
 
-            if (senha.length() < 8 || senha.length() > 64) {
-                mensagemParam = "A senha deve ter no minímo 8 caracteres e no máximo 64.";
+            if ((senha == null || senha.isEmpty()) && verificar == false) {
+                mensagemParam = "A senha não pode ser vazia.";
+                System.out.println(mensagemParam);
                 valida = false;
+            }
+            if ((senha.length() < 8 || senha.length() > 64) && verificar == true) {
+                mensagemParam = "A senha deve ter no minímo 8 caracteres e no máximo 64.";
+                System.out.println(mensagemParam);
+                valida = false;
+                return valida;
             }
 
             for (char c : senha.toCharArray()) {
@@ -98,11 +124,13 @@
                 }
             }
 
-            if (maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) {
+            if ((maiuscula == false || minuscula == false || algarismo == false || especial == false || espaco == true) && verificar == true) {
                 mensagemParam = "A senha deve ter maiúscula, minúscula, número, caractere especial, sem espaços e de 8 à 64 caracteres.";
+                System.out.println(mensagemParam);
                 valida = false;
             }
             setMensagem(mensagemParam);
+            System.out.println("Antes de retornar: " + mensagemParam);
             return valida;
         }
 
@@ -115,39 +143,37 @@
             return this.mensagem;
         }
 
-        
-        private String senha1;
-        private String senha2;
-/*
-        public boolean redefinirSenha(String email, String nome) throws InterruptedException {
-            boolean redefinicaoSucedida = false;
-            boolean valido = this.email.emailAutenticacao(email, "restabelecimento", nome);  
-            digitar.digitar("Se existir uma conta associada a este e-mail, enviaremos as instruções de recuperação."); 
-            if (valido == true) {
-                digitar.digitar("| Altere a sua senha: |");
-                boolean senhaCorreta = false;
-                
-                    while (senhaCorreta == false) {
-                    digiteSenha();
-                    senhaCorreta = validaSenha(senha1, senha2);   
+    
+
+
+        public boolean redefinirSenha(String token, String senha1, String senha2) {
+                    boolean redefinicaoSucedida = false;
+                    try {
+                        boolean senhaCorreta = validaSenha(senha1, senha2);   
+                        String senhaHash;
+                        if (senhaCorreta == true) {
+                            String email = tokenRepositorio.pegarEmailToken(token);
+                            Boolean senhasIguais = criptografarSenha.macthSenha(senha1, email);
+                            System.out.println(senhasIguais);
+                            if (senhasIguais) {
+                                setMensagem("A nova senha deve ser diferente da antiga.");
+                            } else {
+                                senhaHash = criptografarSenha.criptografiaSenha().encode(senha1);
+                                int mudou = repositorio.mudarSenha(email, senhaHash);
+                                tokenRepositorio.usadoTrue(token);
+                                    if (mudou == 1) {
+                                        redefinicaoSucedida = true;
+                                    } else {
+                                        setMensagem("Não foi possível fazer a alteração. Tente novamente!");
+                                    } 
+                            }
+                        }
+                       
+                    } catch (Exception erro) {
+                        erro.printStackTrace();
+                        setMensagem(erro.toString());
                     }
-                if (senhaCorreta = true) {
-                    String senhaHash = criptografarSenha.criptografiaSenha().encode(senha1);
-                    int mudou = repositorio.mudarSenha(email, senhaHash);
-                    if (mudou == 1) {
-                        redefinicaoSucedida = true;
-                    }
-                }
-            }
- 
+                   
         return redefinicaoSucedida;
-    }
-*/
-    public void digiteSenha() throws InterruptedException 
-    {
-        digitar.digitar("Digite a sua senha: "); 
-        senha1 = digitar.ler().trim();
-        digitar.digitar("Confirme a sua senha: "); 
-        senha2 = digitar.ler().trim();
     }
 }

@@ -5,7 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-import java.time.LocalDate; 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 @Entity // --> Selo do JPA que diz ao hibernate o que essa classe é de fato
@@ -25,8 +26,10 @@ public class Usuario {
     private String sobrenome;
     private BigDecimal salario;
     private LocalDate dataNascimento;
+    private LocalDateTime data_user_criado;
+    private boolean ativo;
     
-    public Usuario(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome) {
+    public Usuario(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome,  LocalDateTime dataUserCriado, boolean ativo) {
        
         this.nome_primeiro = nome_primeiro;
         this.sobrenome = sobrenome;
@@ -34,6 +37,8 @@ public class Usuario {
         this.senha = senha;
         this.salario = salario;
         this.dataNascimento = dataNascimento;
+        this.data_user_criado = dataUserCriado;
+        this.ativo = ativo;
 
     }
 

@@ -22,13 +22,13 @@ public class Saida {
     private String obs;
 
     
-    private BigInteger fk_user;
+    private Long fk_user;
     
     public Saida() {
         
     }
 
-    public Saida(String nome, LocalDate registro, String tipo, BigDecimal valor, String obs, BigInteger id) {
+    public Saida(String nome, LocalDate registro, String tipo, BigDecimal valor, String obs, Long id) {
         this.nome = nome;
         this.dataRegistro = registro;
         this.tipo = tipo;
@@ -57,7 +57,7 @@ public class Saida {
         return obs;
     }
 
-    public BigInteger getFk() {
+    public Long getFk() {
         return fk_user;
     }
 }

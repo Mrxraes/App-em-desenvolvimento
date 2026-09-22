@@ -28,12 +28,15 @@ public class PasswordCripto {
         boolean senhaMatch = false;
         String emailExiste = metodos.existeEmail(email);
         String senhaHashBanco =  metodos.consultarSenha(email);
+        System.out.println("Senha: " + senha);
+        System.out.println("Hash: " + senhaHashBanco);
+        System.out.println("Resultado: " + BCrypt.checkpw(senha, senhaHashBanco));
         if (BCrypt.checkpw(senha, senhaHashBanco)) {
                 senhaMatch = true;
-                //System.out.println("Tudo certo!");
-        } /* else {
+                System.out.println("Tudo certo!");
+        } else {
             System.out.println("Senha incorreta.");
-        } */
+        } 
         return senhaMatch;
     }    
 }

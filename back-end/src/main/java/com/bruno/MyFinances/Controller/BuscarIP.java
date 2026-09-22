@@ -22,8 +22,8 @@ public class BuscarIP {
 
     @GetMapping("/login")
     public String IpLogin(HttpServletRequest request, String email, String cadasOuLogin, String nome) {
-        //ip = request.getRemoteAddr();
-        //userAgent = request.getHeader("User-Agent");
+        ip = request.getRemoteAddr();
+        userAgent = request.getHeader("User-Agent");
         ip = "Ip do usuario";
         userAgent = "dispositivo";
         if (userAgent.contains("Windows")) {

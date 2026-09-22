@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.bruno.MyFinances.models.Entrada;
+import com.bruno.MyFinances.models.Usuario;
 import com.bruno.MyFinances.repository.EntradaRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
@@ -86,7 +87,7 @@ public class ServiceEntrada {
 
     public void criarEntradas(String nome, LocalDate data, BigDecimal valor, String obs, String tipo) {
         String pegarEmail = email.getEmail();
-        BigInteger fk = repoUsuario.pegarId(pegarEmail);
+        Long fk = repoUsuario.pegarId(pegarEmail);
         Entrada criar = new Entrada(nome, data, valor, obs, fk, tipo);
         try {
             repoEntrada.save(criar);

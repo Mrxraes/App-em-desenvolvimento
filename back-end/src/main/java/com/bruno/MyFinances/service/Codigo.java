@@ -15,15 +15,17 @@ public class Codigo {
 
 
     private final UsuarioRepository repositorio;
+    private final Email emailService;
 
-    public Codigo(UsuarioRepository repositorio) {
+    public Codigo(UsuarioRepository repositorio, Email emailService) {
         this.repositorio = repositorio;
+        this.emailService = emailService;
     }
 
     private  String codigo;
 
     public String criarCod() {
-    String[] alfabeto = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
     String[] algarismo = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 
     codigo = "";
@@ -32,14 +34,10 @@ public class Codigo {
 
     for (int i = 0; i <= 5; i++) {
         double alfOrAlg = Math.random() * 2;
-        int numberAleatorioInt = (int)alfOrAlg;
-        if (numberAleatorioInt == 0) {
-            String letraAleatoria = alfabeto[(int) (Math.random() * 25)];
-            letras.add(letraAleatoria);
-        } else if (numberAleatorioInt == 1) {
-              String numeroAleatorio = algarismo[(int) (Math.random() * 9)];
-            letras.add(numeroAleatorio);
-        }
+
+    String numeroAleatorio = algarismo[(int) (Math.random() * 9)];
+    letras.add(numeroAleatorio);
+        
         codigo += letras.get(i);
     }
     //System.out.println(codigo);
@@ -48,11 +46,12 @@ public class Codigo {
 
     private boolean loginSucedido;
     private String mensagem;
-
+    private boolean perfilAtivo;
     
         public void verificarCod(String code, LocalDateTime criado) {
             String codigoTable;
             String digitarCod = code;
+            perfilAtivo = emailService.getAtivo();
             codigoTable =  repositorio.pegarCod(codigo, criado.toLocalDate());
             System.out.println("Codigo da tabela " + codigoTable);
             System.out.println("Codigo do request " + digitarCod);
@@ -86,6 +85,7 @@ public class Codigo {
                 
                 System.out.println(loginSucedido);
                 System.out.println(mensagem);
+                System.out.println(perfilAtivo);
             
             if (loginSucedido == true) {
                 repositorio.excluirCod();
@@ -99,5 +99,10 @@ public class Codigo {
 
     public String getMensagem() {
         return mensagem;
+    }
+
+    
+    public boolean getPerfilAtivo() {
+        return perfilAtivo;
     }
 }

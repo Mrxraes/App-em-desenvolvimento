@@ -1,8 +1,9 @@
+//organizar codigo
 import { StyleSheet, View, Text, Image, TextInput, Pressable } from 'react-native'
 import { Colors } from '@/constants/Colors'
 import { LinearGradient } from 'expo-linear-gradient'
 import { useFonts } from '@expo-google-fonts/poppins'
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -31,6 +32,7 @@ export default function verificacaoEmail() {
     const [mensagem, setMensagem] = useState("")
     const [sucesso, setSucesso] = useState("")
     const [popUpMostrar, setPopUpMostrar] = useState(false)
+    const [popUpMsg, setPopUpMsg] = useState(null)
 
    useEffect(() => {
 
@@ -109,6 +111,20 @@ export default function verificacaoEmail() {
         setMensagem(resultado.mensagem)
         setSucesso(resultado.loginSucedido)
         const loginSucedido = resultado.loginSucedido
+        const perfilAtivo = resultado.perfilAtivo
+
+        if (loginSucedido && perfilAtivo) {
+            router.replace("/(tabs)");
+        } else if (loginSucedido && !perfilAtivo) {
+            router.push({
+                pathname: "/emailExiste",
+                params: {
+                    email: email,
+                    loginSucedido: loginSucedido,
+                }
+            })
+        }
+
             } catch (e) {
                 console.log(e)
             }
@@ -154,11 +170,17 @@ export default function verificacaoEmail() {
         setPopUpMostrar(false)
     }
 
+    const voltarLogin = async () => {
+        router.push({
+            pathname: "/login"
+        })
+    }
+
     return (
     
 
         <LinearGradient colors={[Colors.primary, Colors.primaryDark]} style={styles.background}>
-            {popUpMostrar && (
+            {popUpMostrar && tempoReenvioCod > 0 && (
                 <View style={styles.divMsgCode}>
                 <Pressable style={({ pressed }) => [styles.btnFechar, pressed && styles.btnFecharPress]} onPress={mudarEstadoPop}>
                     {({ pressed }) => (
@@ -185,7 +207,7 @@ export default function verificacaoEmail() {
                     Código de Verificação
                 </Text>
                     <View style={styles.alinharInputDiv}>
-                            <TextInput style={styles.designEntrada}  placeholder="_" maxLength={1} ref={input1} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada}  placeholder="_" maxLength={1} ref={input1} autoCapitalize="characters" keyboardType="numeric"
                             onChangeText={(texto) => {
                                 let novoCodigo = [...codigoArray];
                                     novoCodigo[0] = texto;
@@ -205,8 +227,7 @@ export default function verificacaoEmail() {
                                     console.log(novoCodigo)
                                 }
                             }}></TextInput>
-                    
-                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input2} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input2} autoCapitalize="characters" keyboardType="numeric"
                             onChangeText={(texto) => {
                                 let novoCodigo = [...codigoArray];
                                     novoCodigo[1] = texto;
@@ -230,7 +251,7 @@ export default function verificacaoEmail() {
                                 }
                             }}></TextInput>
 
-                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input3} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input3} autoCapitalize="characters" keyboardType="numeric"
                             onChangeText={(texto) => {
                                 let novoCodigo = [...codigoArray];
                                     novoCodigo[2] = texto;
@@ -253,7 +274,7 @@ export default function verificacaoEmail() {
                                 }
                             }}></TextInput>
 
-                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input4} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input4} autoCapitalize="characters" keyboardType="numeric"
                             onChangeText={(texto) => {
                                 let novoCodigo = [...codigoArray];
                                     novoCodigo[3] = texto;
@@ -275,7 +296,7 @@ export default function verificacaoEmail() {
                                 }
                             }}></TextInput>
                             
-                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input5} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input5} autoCapitalize="characters" keyboardType="numeric"
                              onChangeText={(texto) => {
                                 let novoCodigo = [...codigoArray];
                                     novoCodigo[4] = texto;
@@ -297,7 +318,7 @@ export default function verificacaoEmail() {
                                 }
                             }}></TextInput>
 
-                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input6} autoCapitalize="characters"
+                            <TextInput style={styles.designEntrada} placeholder="_" maxLength={1} ref={input6} autoCapitalize="characters" keyboardType="numeric"
                             onChangeText={( texto ) => {
                                 let novoCodigo = [...codigo];
                                     novoCodigo[5] = texto;
@@ -344,10 +365,11 @@ export default function verificacaoEmail() {
                         <Text style={[styles.reenviarCodeText1, pressed && styles.reenviarCodeText1Pressed,]}>Reenviar código</Text></>
                         )}  
                     </Pressable>
+
                     {tempoReenvioCod > 0 && (
-                        <View>
-                            <Text>
-                                {"00:" + String(tempoReenvioCod).padStart(2, '0')}
+                        <View style={styles.divConometroReenvio}>
+                            <Text style={styles.textConometroReenvio}>
+                                {"Aguarde 00:" + String(tempoReenvioCod).padStart(2, '0') + " para reenviar."}
                             </Text>
                         </View>
                     )}
@@ -357,7 +379,7 @@ export default function verificacaoEmail() {
 
                     <Pressable style={({pressed}) => [styles.voltarLoginButton, pressed && styles.voltarLoginButtonPressed]}>
                         {({ pressed }) => (
-                        <><Ionicons name="chevron-back" size={14} style={[styles.voltarLoginText, pressed && styles.voltarLoginTextPressed,]}></Ionicons><Text style={[styles.voltarLoginText, pressed && styles.voltarLoginTextPressed,]}>Voltar para o login</Text></>
+                        <><Ionicons name="chevron-back" size={14} style={[styles.voltarLoginText, pressed && styles.voltarLoginTextPressed,]}></Ionicons><Text style={[styles.voltarLoginText, pressed && styles.voltarLoginTextPressed,]} onPress={voltarLogin}>Voltar para o login</Text></>
                         )}  
                     </Pressable>
             </View>
@@ -380,7 +402,8 @@ export default function verificacaoEmail() {
             width: '85%',
             maxWidth: 400,
             borderRadius: 10,
-            padding:30,
+            padding:'5%',
+            boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.35)'
         },
 
         title: {
@@ -492,7 +515,8 @@ export default function verificacaoEmail() {
 
         reenviarCodeText:    {
             color: Colors.textSecondary,
-            fontSize: 12
+            fontSize: 12,
+            fontFamily: 'PlusJakartaMedium',
 
         },
 
@@ -586,13 +610,14 @@ export default function verificacaoEmail() {
             width: '80%',
             borderRadius: 10,
             flexDirection: 'row',
-            alignItems: 'center'
+            alignItems: 'center',
+            boxShadow: '0px 1px 10px rgba(0, 0, 0, 0.35)'
         },
 
 
         imgMsgCode: {
             width: 30,
-            height: 30
+            height: 30,
         },
 
         linhaVertical: {
@@ -637,5 +662,15 @@ export default function verificacaoEmail() {
 
         simbolBtnFecharPress: {
             color:  Colors.background,
+        },
+
+        divConometroReenvio: {
+            marginTop: 5
+        },
+
+        textConometroReenvio: {
+            color: Colors.textSecondary,
+            fontSize: 12,
+            fontFamily: 'PlusJakartaExtraLight'
         }
     })  

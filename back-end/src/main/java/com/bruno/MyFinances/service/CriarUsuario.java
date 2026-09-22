@@ -2,6 +2,7 @@ package com.bruno.MyFinances.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.bruno.MyFinances.models.Usuario;
 import com.bruno.MyFinances.repository.UsuarioRepository;
@@ -22,8 +23,8 @@ public class CriarUsuario {
     }
 
     //1implementar o CEP
-    public void criarUser(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome) {
-        Usuario criarUser = new Usuario(nome_primeiro, email, senha, salario, dataNascimento, sobrenome);
+    public void criarUser(String nome_primeiro, String email, String senha, BigDecimal salario, LocalDate dataNascimento, String sobrenome, LocalDateTime dateHoraCriado, boolean ativo) {
+        Usuario criarUser = new Usuario(nome_primeiro, email, senha, salario, dataNascimento, sobrenome, dateHoraCriado, ativo);
         try 
         {
             repositorio.save(criarUser);
