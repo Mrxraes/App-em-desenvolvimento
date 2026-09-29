@@ -1,6 +1,8 @@
 package com.bruno.MyFinances.Controller;
+import com.bruno.MyFinances.repository.TokenLoginRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 import com.bruno.MyFinances.service.Codigo;
+import com.bruno.MyFinances.service.Token;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
 import com.bruno.MyFinances.service.EnviarEmail;
@@ -8,6 +10,11 @@ import com.bruno.MyFinances.service.Password;
 import com.bruno.MyFinances.service.PasswordCripto;
 import com.bruno.MyFinances.dto.LoginRequest;
 import com.bruno.MyFinances.dto.LoginResponse;
+import com.bruno.MyFinances.dto.ValidationRequest;
+import com.bruno.MyFinances.dto.ValidationResponse;
+import com.bruno.MyFinances.dto.ValidationTokenLoginRequest;
+import com.bruno.MyFinances.dto.ValidationTokenLoginResponse;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,15 +31,25 @@ import java.util.ArrayList;
     public class Login {
 
         private final Email validarEmail;
+        private final EnviarEmail enviarEmail;
         private final Password validarSenha;
         private final PasswordCripto senhaMatch;
+        private final UsuarioRepository repositorio;
+        private final Codigo cod;
+        private final Token tokenMethods;
+        private final TokenLoginRepository tokenLoginRepositorio;
    
 
 
-        public Login(Email validarEmail, Password validarSenha,  PasswordCripto senhaMatch) {
+        public Login(Email validarEmail,EnviarEmail enviarEmail, Password validarSenha,  PasswordCripto senhaMatch, UsuarioRepository repositorio, Codigo cod, Token criarToken, TokenLoginRepository tokenLoginRepositorio) {
             this.validarEmail = validarEmail;
             this.validarSenha = validarSenha;
             this.senhaMatch = senhaMatch;
+            this.repositorio = repositorio;
+            this.cod = cod;
+            this.enviarEmail = enviarEmail;
+            this.tokenMethods = criarToken;
+            this.tokenLoginRepositorio = tokenLoginRepositorio;
         }
 
         private String email;
@@ -135,9 +152,6 @@ import java.util.ArrayList;
                 }
                 // Cuida da passagem para a página de verificação
     
-                
-                
-
             }
         
         } catch (InterruptedException e) 
@@ -148,11 +162,69 @@ import java.util.ArrayList;
                 
         System.out.println(email + " 4 " + senha);
         System.out.println(passarPag);
+        boolean perfilAtivo = repositorio.perfilAtivo(emailFormatado);
+
         return new LoginResponse(
             passarPag,
-            mensagem
+            mensagem,
+            perfilAtivo
         );
     }
+
+     String token;
+    
+    @PostMapping("/validarEmail") // verifica a igualdade do codigo 
+    public ValidationResponse validarEmail(@RequestBody ValidationRequest request) throws InterruptedException {
+        
+        String mensagem;
+        boolean loginSucedido;
+        boolean perfilAtivo;
+        String codigoInput = request.getCodigo();
+        LocalDateTime criado = getCodeHora();
+        cod.verificarCod(codigoInput, criado);
+        loginSucedido = cod.getLoginSucedido();
+        mensagem = cod.getMensagem();
+        perfilAtivo = cod.getPerfilAtivo();
+
+        if (loginSucedido && perfilAtivo) {
+            // criar Token que sera salvo no celular para requisitar e verificar que aquele usuario ja possui login
+            tokenMethods.criarTokenLogin(emailFormatado);
+            Long id = repositorio.pegarId(emailFormatado);
+            token = tokenLoginRepositorio.getToken(id);
+            System.out.println(token + "validarEmail");
+        }
+
+        return new ValidationResponse(loginSucedido, mensagem, perfilAtivo, token);
+    } 
+
+    @PostMapping("/enviarEmailAutenticacao") // envia o codigo de 6 digitos
+    public void enviarEmail() {
+        repositorio.excluirCod();
+        String emailFormatado = getEmailFormatado();
+        String emailExiste = getEmailLogin();
+        Boolean senhaIguais = getSenhasIguais();
+            if (emailExiste.equals("1") && senhaIguais == true) {
+                String primeiro_nome = repositorio.consultarNome(emailFormatado);
+                String codigo = cod.criarCod();
+                LocalDateTime criadoHora = LocalDateTime.now();
+                repositorio.inserirCod(codigo, criadoHora.toLocalDate());
+                System.out.println(criadoHora);
+                setCodeHora(criadoHora); 
+                enviarEmail.enviarEmailAutenticacao(codigo, emailFormatado, "login", primeiro_nome);
+            } else {
+                System.out.println("Algo fora dos padrões aconteceu.");
+            }
+    }
+
+    @PostMapping("/validarTokenLogin")
+    public ValidationTokenLoginResponse validarTokenLogin(@RequestBody ValidationTokenLoginRequest request) {
+        String token = request.getToken();
+        boolean tokenValido = tokenMethods.validarToken(token);
+        System.out.println(token + " validarTokenLogin"); 
+        return new ValidationTokenLoginResponse(tokenValido);
+    }
+
+
 
         public String getEmailFormatado() {
             return emailFormatado;

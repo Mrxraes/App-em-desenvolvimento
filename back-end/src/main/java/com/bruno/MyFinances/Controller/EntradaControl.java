@@ -2,12 +2,17 @@ package com.bruno.MyFinances.Controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
+import com.bruno.MyFinances.dto.EntradaRequest;
+import com.bruno.MyFinances.dto.EntradaResponse;
 import com.bruno.MyFinances.service.CriarEntradas;
 import com.bruno.MyFinances.service.ServiceEntrada;
 import com.bruno.MyFinances.service.Digitacao;
@@ -24,40 +29,18 @@ public class EntradaControl {
         this.serviceEntradas = serviceEntradas;
     }
 
-    public void entradas() throws InterruptedException {
-        boolean sair = false;
-        while (sair == false) {
-            digitar.digitar("| INTERFACE DE ENTRADAS |");
-            digitar.digitar("| 1 - Registrar entradas |");
-            digitar.digitar("| 2 - Ver entrada Mensal |");
-            digitar.digitar("| 3 - Ver todos os ganhos do mês |");
-            digitar.digitar("| 3 - Sair |");
-            // mês passado
-            // do ano
-            String opcao = digitar.ler().trim();
-            switch (opcao) {
-                case "1":
-                    registarEntradas();
-                    break;
-                case "2":
-                    entradaMensal();
-                    break;
-                case "3":
-                    entradasCont();
-                    break;
-                case "4":
-                    sair = true;
-                    break;
-            }
-        }
-    }
+    private String token;
+    private LocalDateTime data;
 
     public void entradaMensal() throws InterruptedException {
-        serviceEntradas.todasEntradas();
+        //serviceEntradas.todasEntradas();
     }
 
-    public void entradasCont() throws InterruptedException {
-        List<BigDecimal> soma = serviceEntradas.entradaTotal();
+    @PostMapping("/dadosEntrada")
+    public EntradaResponse entradasCont(@RequestBody EntradaRequest request) throws InterruptedException {
+        token = request.getToken();
+        data = request.getData();
+        List<BigDecimal> soma = serviceEntradas.entradaTotal(token, data);
         String valorSalario = String.valueOf(soma.get(0));
         String valorExtra = String.valueOf(soma.get(1));
         String valorRendimento = String.valueOf(soma.get(2));
@@ -67,6 +50,9 @@ public class EntradaControl {
         digitar.digitar("| ENTRADA EXTRA: R$" + valorExtra + " |");
         digitar.digitar("| SAIDAS RENDIMENTOS DE INVESTIMENTO: R$" + valorRendimento + " |");
         digitar.digitar("| VALOR TOTAL: R$" + valorTotal + " |");
+
+        return new EntradaResponse(valorSalario , valorExtra , valorRendimento, valorTotal);
+
     }
 
     public void registarEntradas() throws InterruptedException {

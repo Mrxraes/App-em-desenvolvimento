@@ -7,13 +7,14 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 
+import * as SecureStore from "expo-secure-store"
 
 export default function verificacaoEmail() {
 
     //console.log("Cheguei na verificação");
 
   
-    const { email } = useLocalSearchParams<{ email: string}>();
+    const { email } = useLocalSearchParams<{ email?: string}>();
     const [ tempo, setTempo ] = useState(60*10)
     const [ numberTF, setNumberTF ] = useState(true)
     const [ tempoReenvioCod, setTempoReenvioCod ] = useState(0) 
@@ -54,16 +55,12 @@ export default function verificacaoEmail() {
 
     }, []);
 
-
-
     useEffect(() => { 
-            console.log("Fora")
-        const SendMail = async () => {
+        
+    const SendMail = async () => {
         //Resquisições devem ter "try" e "catch"
         //Eu devo chamar o método no useEffect e o "[]" diz que ele sera chamado quandio carregar a tela, não a cada componente inserido
             try {
-
-            console.log("Dentro ")
                 const response = await fetch('http://192.168.15.6:8080/api/enviarEmailAutenticacao', {
                     method: 'POST',
                 }) 
@@ -74,8 +71,9 @@ export default function verificacaoEmail() {
             } catch (erro) {
                 console.log(erro)
             }
-        };
+    };
         SendMail();
+
     }, [])
 
     const minutos = Math.floor(tempo / 60)
@@ -92,10 +90,12 @@ export default function verificacaoEmail() {
                 return null;
             }
 
+
+
+
     const HandleValidation = async () => {
-        console.log(codigo);
+   
         try {
-            console.log("dentro");
             const response = await fetch('http://192.168.15.6:8080/api/validarEmail', {
             method: 'POST',
             headers: {
@@ -112,9 +112,16 @@ export default function verificacaoEmail() {
         setSucesso(resultado.loginSucedido)
         const loginSucedido = resultado.loginSucedido
         const perfilAtivo = resultado.perfilAtivo
+        const token = resultado.token;
 
         if (loginSucedido && perfilAtivo) {
-            router.replace("/(tabs)");
+            console.log("criou um tokem no celular")
+            console.log(token)
+            await SecureStore.setItemAsync(
+                'tokenLogin',
+                token
+            )
+            router.replace("../(tabs)");
         } else if (loginSucedido && !perfilAtivo) {
             router.push({
                 pathname: "/emailExiste",
@@ -175,6 +182,8 @@ export default function verificacaoEmail() {
             pathname: "/login"
         })
     }
+
+    
 
     return (
     

@@ -4,11 +4,13 @@ public class ValidationResponse {
     private boolean loginSucedido;
     private String mensagem;
     private boolean perfilAtivo;
+    private String token;
 
-    public ValidationResponse(boolean loginSucedido, String mensagem, boolean perfilAtivo) {
+    public ValidationResponse(boolean loginSucedido, String mensagem, boolean perfilAtivo, String token) {
         this.loginSucedido = loginSucedido;
         this.mensagem = mensagem;
         this.perfilAtivo = perfilAtivo;
+        this.token = token;
     }
 
     public boolean getloginSucedido() {
@@ -19,8 +21,12 @@ public class ValidationResponse {
         return mensagem;
     }
 
-     public boolean getPerfilAtivo() {
+    public boolean getPerfilAtivo() {
         return perfilAtivo;
+    }
+
+    public String getToken() {
+        return token;
     }
 
 }

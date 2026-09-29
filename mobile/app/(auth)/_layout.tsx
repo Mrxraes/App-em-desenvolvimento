@@ -18,7 +18,7 @@ export default function redirecionamentoAuth() {
       />
 
       <Stack.Screen
-        name = "verificacaoEmail"
+        name = "verificacaoUser"
       />
 
       <Stack.Screen

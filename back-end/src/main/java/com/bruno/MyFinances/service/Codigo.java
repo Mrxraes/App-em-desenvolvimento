@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 import org.springframework.stereotype.Service;
 
-import com.bruno.MyFinances.Controller.Login;
-import com.bruno.MyFinances.dto.ValidationRequest;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
 @Service

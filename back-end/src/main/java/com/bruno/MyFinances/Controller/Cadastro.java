@@ -1,9 +1,16 @@
 package com.bruno.MyFinances.Controller;
 import com.bruno.MyFinances.dto.CadastroResponse;
 import com.bruno.MyFinances.dto.CadastroResquest;
+import com.bruno.MyFinances.dto.ConfirmarCadastroRequest;
+import com.bruno.MyFinances.dto.ConfirmarCadastroResponse;
+import com.bruno.MyFinances.dto.RedefinitionRequest;
+import com.bruno.MyFinances.dto.RedefinitionResponse;
+import com.bruno.MyFinances.repository.UsuarioRepository;
+import com.bruno.MyFinances.service.Token;
 import com.bruno.MyFinances.service.CriarUsuario;
 import com.bruno.MyFinances.service.Digitacao;
 import com.bruno.MyFinances.service.Email;
+import com.bruno.MyFinances.service.EnviarEmail;
 import com.bruno.MyFinances.service.Password;
 import com.bruno.MyFinances.service.PasswordCripto;
 
@@ -27,22 +34,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class Cadastro {
 
     private final CriarUsuario criarUser;
-    private final Digitacao digitar;
+
     private final Email validarEmail;
     private final Password validarSenha;
     private final PasswordCripto criptografarSenha;
     private final BuscarIP http;
-    private final HttpServletRequest requestIp;
 
-    public Cadastro(CriarUsuario criador, Digitacao digitarRecebido, Email validarEmail, Password validarSenha, PasswordCripto criptografarSenha, BuscarIP http,  
-        HttpServletRequest request) {
+    private final EnviarEmail enviarEmail;
+    private final UsuarioRepository repositorio;
+    private final HttpServletRequest requestIp;
+    private final Token criarToken;
+
+
+    public Cadastro(CriarUsuario criador, Email validarEmail, Password validarSenha, PasswordCripto criptografarSenha, BuscarIP http,  
+        HttpServletRequest request, EnviarEmail enviarEmail, UsuarioRepository repositorio, Token link) {
         this.criarUser = criador;
-        this.digitar = digitarRecebido;
         this.validarEmail = validarEmail;
         this.validarSenha = validarSenha;
         this.criptografarSenha = criptografarSenha;
         this.http = http;
         this.requestIp = request;
+        this.enviarEmail = enviarEmail;
+        this.repositorio = repositorio;
+        this.criarToken = link;
     }
 
     private String nome_primeiro;
@@ -145,6 +159,9 @@ public class Cadastro {
             
                 salario = request.getSalario();
                     if (salario.matches("\\d+")) {
+                        if (salario == null ) {
+                            salario = "0";
+                        }
                         salarioBig = new BigDecimal(salario); 
                         validoSalario = true;
                     } else {
@@ -204,4 +221,51 @@ public class Cadastro {
            return new CadastroResponse(validoNome, validoSobrenome, validoEmail, validoSalario, validaData, validoSenha, mensagemNome, mensagemSobrenome, mensagemEmail, mensagemSalario ,mensagemData, mensagemSenha);
 
     }
+
+    private String mensagem;
+    private boolean sucessoEnvio;
+    private String emailFormatado;
+
+     @PostMapping("/confirmarCadastro")
+    public ConfirmarCadastroResponse confirmarCadastro(@RequestBody ConfirmarCadastroRequest request) throws InterruptedException {
+        
+
+        String email = request.getEmail();
+        String loginSucedido = request.getLoginSucedido();
+
+        emailFormatado = email.trim().toLowerCase();
+
+        validarEmail.validarEmail(emailFormatado);
+        boolean condicaoEmail = validarEmail.getValida();
+
+        String emailExiste = repositorio.existeEmail(emailFormatado);
+
+        if (condicaoEmail == false) {
+            mensagem = validarEmail.getMensagem();
+            sucessoEnvio = false;
+            // depois eu so quero mostrar se o e-mail sem a sintaxe certa, depois disso a msg sera "Se existir algum e-mail, vc receberá as instruções"
+        } else if (emailExiste.equals("1") && condicaoEmail == true) {
+
+            String primeiro_nome = repositorio.consultarNome(emailFormatado);
+            String token = criarToken.criarTokenConfirmarCadastro(email);
+
+            sucessoEnvio = enviarEmail.enviarEmailConfirmarEmail(emailFormatado, primeiro_nome, token, loginSucedido);
+            if (sucessoEnvio) {
+                mensagem = "Envio de e-mail bem sucedido.";
+            } else {
+                mensagem = "Algo errado aconteceu no envio.";
+            }
+        }
+
+        // salvar os dados que vou precisar depois pra fazer a API de redefinição de senha
+        // verificar email pelo id
+        // token é valido
+        // update no 'usado' para tru 
+
+        return new ConfirmarCadastroResponse(
+            mensagem,
+            sucessoEnvio
+        );
+    }
+
 }

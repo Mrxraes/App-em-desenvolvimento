@@ -82,4 +82,14 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             """, nativeQuery = true)
     Boolean pegarAtivo(@Param("email") String email);
 
+    @Query(value="""
+            SELECT email FROM usuario WHERE id = :id
+            """, nativeQuery = true)
+    String getEmail(@Param("id") Long id);
+
+    @Query(value="""
+            SELECT ativo FROM usuario WHERE email = :email
+            """, nativeQuery = true)
+    boolean perfilAtivo(@Param("email") String email);
+
 }

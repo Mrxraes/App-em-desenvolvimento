@@ -11,6 +11,12 @@ import {
     TextInput,
 } from 'react-native';
 
+import * as WebBrowser from 'expo-web-browser'
+import * as Google from 'expo-auth-session/providers/google'
+import * as SecureStore from "expo-secure-store"
+
+// ajuda o navegador fechar quando a autenticação é concluida
+
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from '@expo-google-fonts/poppins';
@@ -70,6 +76,10 @@ export default function Login() {
             sucessoCadastro?: string;
         }>();
 
+    const { tokenLogin } = 
+        useLocalSearchParams<{
+            tokenLogin?: string
+        }>();
 
 
     // ========================================================
@@ -102,13 +112,19 @@ export default function Login() {
 
     useEffect(() => {
 
+        
+
         formatMensagemErro();
 
         mensagemRedefinicaoSenha();
         
         mensagemCadastroSucedido();
 
-    }, [mensagemErro, sucessoRedefinicao, sucessoCadastro]);
+        saveTokenLogin();
+
+        getTokenLogin();
+
+    }, [mensagemErro, sucessoRedefinicao, sucessoCadastro, tokenLogin]);
 
     console.log(mensagemErro)
     console.log(sucessoRedefinicao)
@@ -203,6 +219,51 @@ export default function Login() {
 
     };
 
+    const saveTokenLogin = async () => {
+        if (tokenLogin) {
+            console.log("token login criado no celular")
+             await SecureStore.setItemAsync(
+            "tokenLogin", 
+            tokenLogin
+            )
+        }
+        
+    }
+
+    const getTokenLogin = async () => {
+        
+        const token = await SecureStore.getItemAsync(
+        "tokenLogin", 
+        )
+            console.log("token login tentando ver aqui")
+            console.log(token)
+        
+        const response = await fetch('http://192.168.15.6:8080/api/validarTokenLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify ({
+                token: token
+            })
+        })
+
+        const resposta = await response.json();
+        const tokenValido = resposta.tokenValido;
+
+        console.log(tokenValido + " token valido")
+        console.log(token)
+
+        if (tokenValido && token) {
+            router.replace({
+                pathname: '../(tabs)',
+                params: {
+                  token: token  
+                },
+            })
+        }
+    }
+
 
     // ========================================================
     // FECHAR POPUP
@@ -246,16 +307,22 @@ export default function Login() {
             setpassarPag(resultado.passarPag);
             setMsg(resultado.mensagem);
 
-
-            if (resultado.passarPag === true) {
+console.log(resultado.passarPag + " " + resultado.perfilAtivo + "variaveis") 
+            if (resultado.passarPag === true && resultado.perfilAtivo === true) {
 
                 router.push({
-                    pathname: '/verificacaoEmail',
+                    pathname: '/verificacaoUser',
                     params: {
                         email: email,
                     },
                 });
-
+            } else if (resultado.passarPag === true  && resultado.perfilAtivo === false) {
+                   router.push({
+                    pathname: '/emailExiste',
+                    params: {
+                        email: email,
+                    },
+                });
             }
 
         } catch (error) {

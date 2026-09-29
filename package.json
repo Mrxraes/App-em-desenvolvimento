@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "expo": "^54.0.37"
+    "expo": "^54.0.37",
+    "expo-secure-store": "~15.0.8"
   },
   "devDependencies": {
     "@types/react": "~19.1.10",

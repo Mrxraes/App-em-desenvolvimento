@@ -293,7 +293,7 @@ export default function Cadastro() {
 
                         {/* SALÁRIO */}
                         <Text style={styles.label}>
-                            Salário
+                            Salário (opcional)
                         </Text>
 
                         <View style={salarioBoo? styles.inputContainer : styles.inputContainerError}>

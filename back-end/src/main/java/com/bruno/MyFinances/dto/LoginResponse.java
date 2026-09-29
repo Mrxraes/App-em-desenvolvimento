@@ -8,10 +8,13 @@ public class LoginResponse {
     private boolean passarPag;
     @JsonProperty("mensagem")
     private String mensagem;
+    @JsonProperty("perfilAtivo")
+    private boolean perfilAtivo;
 
-    public LoginResponse(boolean passarPag, String mensagem) {
+    public LoginResponse(boolean passarPag, String mensagem, boolean perfilAtivo) {
         this.passarPag = passarPag;
         this.mensagem = mensagem;
+        this.perfilAtivo = perfilAtivo;
     }
 
     public String getMensagem() {
@@ -22,5 +25,8 @@ public class LoginResponse {
         return passarPag;
     }
 
-  
+    public boolean getPerfilAtivo() {
+        return perfilAtivo;
+    }
+    
 }

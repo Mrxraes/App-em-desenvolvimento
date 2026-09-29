@@ -13,9 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bruno.MyFinances.dto.ConfirmarCadastroRequest;
 import com.bruno.MyFinances.repository.TokenConfirmarEmailRepository;
+import com.bruno.MyFinances.repository.TokenLoginRepository;
 import com.bruno.MyFinances.repository.TokenRedefinirSenhaRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
-import com.bruno.MyFinances.service.CriarToken;
+import com.bruno.MyFinances.service.Token;
 import com.bruno.MyFinances.service.Email;
 
 /**
@@ -29,12 +30,16 @@ public class RedirecionamentoRedefinicao {
     private final Email getEmail;
     private final UsuarioRepository UsuarioRepositorio;
     private final TokenConfirmarEmailRepository tokenCE;
+    private final Token criarToken;
+    private final TokenLoginRepository tokenLoginRepositorio;
 
-    public RedirecionamentoRedefinicao(TokenRedefinirSenhaRepository Token, Email getEmail,  UsuarioRepository UsuarioRepositorio , TokenConfirmarEmailRepository tokenCE) {
+    public RedirecionamentoRedefinicao(TokenRedefinirSenhaRepository Token, Email getEmail,  UsuarioRepository UsuarioRepositorio , TokenConfirmarEmailRepository tokenCE, Token criarToken, TokenLoginRepository tokenLoginRepositorio) {
         this.TokenRepositorio = Token;
         this.getEmail = getEmail;
         this.UsuarioRepositorio = UsuarioRepositorio;
         this.tokenCE = tokenCE;
+        this.criarToken = criarToken;
+        this.tokenLoginRepositorio = tokenLoginRepositorio;
     }
 
     @GetMapping("/redirecionamentoRedefinition")
@@ -65,12 +70,11 @@ public class RedirecionamentoRedefinicao {
     
     @GetMapping("/redirecionamentoConfirmMail")
     public String redirecionamentoConfirmMail(@RequestParam String token, @RequestParam String loginSucedido) {
-        System.out.println("Agora é so criar validação e redirecionamento correto");
+        
         LocalDateTime agora = LocalDateTime.now();
 
         Long idEmail = UsuarioRepositorio.pegarId(getEmail.getEmail());
-        
-
+    
         String tokenBdCe = tokenCE.getToken(token);
         boolean tokenUsadoCE = tokenCE.getUsado(token);
         Long idCE = tokenCE.getId(idEmail);
@@ -85,10 +89,18 @@ public class RedirecionamentoRedefinicao {
                 try {
                     tokenCE.usadoTrue(token);
                     UsuarioRepositorio.usuarioAtivo(idEmail);
-                    return "redirect:exp://192.168.15.6:8081/--/(tabs)";
+                    String emailFormatado = UsuarioRepositorio.getEmail(idEmail);
+                        criarToken.criarTokenLogin(emailFormatado);
+                        Long id = UsuarioRepositorio.pegarId(emailFormatado);
+                        String tokenParam = tokenLoginRepositorio.getToken(id); // colocar no link e ter duas formas, uma pega o dado enviado e a outro as parametros
+                        // mandar pro pag login que vai verificar essa parte
+                    //atualizar a data de login so no front
+                    System.out.println("Criou no back-end");
+                    System.out.println(tokenParam);
+                    return "redirect:exp://192.168.15.6:8081/--/login?tokenLogin=" + tokenParam ;
                 } catch (Exception e) {
                     e.printStackTrace(); 
-                    System.out.println("Não foi possível tornar" + getEmail.getEmail() + "ativo");
+                    System.out.println("Não foi possível tornar" + getEmail.getEmail() + "ativo.");
                     return "redirect:exp://192.168.15.6:8081/--/login?mensagemErro=Algo%20inesperado%20aconteceu";
                 } 
             } else {

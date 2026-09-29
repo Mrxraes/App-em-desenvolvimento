@@ -6,7 +6,7 @@ import { useFonts } from '@expo-google-fonts/poppins'
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-
+import * as SecureStore from 'expo-secure-store'
 
 export default function verificacaoEmail() {
 
@@ -46,12 +46,16 @@ export default function verificacaoEmail() {
                     }),
 
                     }
+
                 );
 
+                //
                 if (!response.ok) {
                     throw new Error("Ocorreu um erro no envio do e-mail.")
                 }
                 console.log("E-mail enviado.")
+                //   
+
             } catch (erro) {
                 console.log(erro)
             }

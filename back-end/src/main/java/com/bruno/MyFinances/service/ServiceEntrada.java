@@ -3,6 +3,7 @@ package com.bruno.MyFinances.service;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.bruno.MyFinances.models.Entrada;
 import com.bruno.MyFinances.models.Usuario;
 import com.bruno.MyFinances.repository.EntradaRepository;
+import com.bruno.MyFinances.repository.TokenLoginRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
 
 @Service
@@ -20,25 +22,24 @@ public class ServiceEntrada {
     private final EntradaRepository repoEntrada;
     private final UsuarioRepository repoUsuario;
     private final Email email;
-    private final Digitacao digitar;
+    private final TokenLoginRepository tokenLoginRepositorio;
 
-    public ServiceEntrada(EntradaRepository repoEntrada, UsuarioRepository repositorio, Email existeEmail, Digitacao digitar) {
+    public ServiceEntrada(EntradaRepository repoEntrada, UsuarioRepository repositorio, Email existeEmail, TokenLoginRepository tokenLoginRepositorio) {
         this.repoEntrada = repoEntrada;
         this.repoUsuario = repositorio;
         this.email = existeEmail;
-        this.digitar = digitar;
+        this.tokenLoginRepositorio = tokenLoginRepositorio;
     }
 
-    public  List<BigDecimal> entradaTotal() {
-        List<BigDecimal> gastosDivididos = new ArrayList<>();
-        //String email = existeEmail.getEmail();
-        //BigInteger id = repositorio.pegarId(email);
-        BigInteger id = BigInteger.valueOf(10);
+    public  List<BigDecimal> entradaTotal(String token, LocalDateTime data) {
+        List<BigDecimal> entradasDivididos = new ArrayList<>();
+        Long id = tokenLoginRepositorio.getId(token);
         
-        BigDecimal valoresSalario = repoEntrada.valoresSalario(id);
-        BigDecimal valoresExtra = repoEntrada.valoresExtra(id);
-        BigDecimal valoresRendimento = repoEntrada.valoresRendimentos(id);
-        BigDecimal valorTotal = repoEntrada.contarValores(id); 
+        
+        BigDecimal valoresSalario = repoEntrada.valoresSalario(id, data);
+        BigDecimal valoresExtra = repoEntrada.valoresExtra(id, data);
+        BigDecimal valoresRendimento = repoEntrada.valoresRendimentos(id, data);
+        BigDecimal valorTotal = repoEntrada.contarValores(id, data); 
         if (valoresSalario == null) {
             valoresSalario = BigDecimal.valueOf(0);
         } if (valoresExtra == null) {
@@ -48,19 +49,17 @@ public class ServiceEntrada {
         } if (valorTotal == null) {
             valorTotal = BigDecimal.valueOf(0);
         }
-        gastosDivididos.add(valoresSalario);
-        gastosDivididos.add(valoresExtra);
-        gastosDivididos.add(valoresRendimento);
-        gastosDivididos.add(valorTotal);
-        System.out.println(gastosDivididos);
-        return gastosDivididos;
+        entradasDivididos.add(valoresSalario);
+        entradasDivididos.add(valoresExtra);
+        entradasDivididos.add(valoresRendimento);
+        entradasDivididos.add(valorTotal);
+        System.out.println(entradasDivididos);
+        return entradasDivididos;
     }
 
-    public void todasEntradas() throws InterruptedException {
-        //String email = existeEmail.getEmail();
-        //BigInteger id = repositorio.pegarId(email);
-        BigInteger id = BigInteger.valueOf(10);
-        List<Entrada> entradas = repoEntrada.selectTodos(id);
+    public void todasEntradas(String token, LocalDateTime dataR) throws InterruptedException {
+        Long id = tokenLoginRepositorio.getId(token);
+        List<Entrada> entradas = repoEntrada.selectTodos(id, dataR);
         int lista = 0;
         for (Entrada entrada: entradas) {
             lista += 1;
@@ -77,8 +76,6 @@ public class ServiceEntrada {
             String valorPrint = String.valueOf(valor);
 
             String obs = entrada.getObs();
-
-            digitar.digitar("| " + lista + ". Nome: " + nome +  " | Data: " + dataPrint + " | Tipo: " + tipo + " | Valor: R$" + valorPrint + " | Observações: " + obs + " |");
 
         }
     }
