@@ -2,7 +2,7 @@ export const Colors = {
     primary: '#2563EB',
     primaryDark: '#133cac',
 
-    background: '#f2f2f2',
+    background: '#f6f6f6',
     surface: '#FFFFFF',
 
     text: '#0F172A',
@@ -10,6 +10,6 @@ export const Colors = {
 
     border: '#E2E8F0',
 
-    success: '#16A34A',
+    success: '#18a465',
     error: '#DC2626',
 }

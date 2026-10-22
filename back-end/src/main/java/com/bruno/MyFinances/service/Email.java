@@ -76,6 +76,11 @@ public class Email {
                 mensagemParam = "O e-mail não pode possuir mais de três caracteres antes de '.com'.";
                 valida = false;
             } 
+        
+            if (!email.endsWith(".com")) {
+                mensagemParam = "O e-mail não pode possuir caracteres depois de '.com'.";
+                valida = false;
+            } 
             int antesDoArroba = email.indexOf("@");  
             if (antesDoArroba > 63) {
                 mensagemParam = "O e-mail não pode possuir mais de 64 caracteres antes de '@'.";

@@ -17,6 +17,14 @@ export default function redirecionamentoAuth() {
         name = "modal"
         options = {{headerShown: false}}
       />
+
+      <Stack.Screen
+        name="Add"
+        options={{
+            headerShown: false,
+      }}
+      />
+
     </Stack>
   )
 }

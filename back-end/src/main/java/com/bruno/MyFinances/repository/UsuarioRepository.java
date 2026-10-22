@@ -92,4 +92,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
             """, nativeQuery = true)
     boolean perfilAtivo(@Param("email") String email);
 
+    @Query(value = """
+    SELECT nome_primeiro
+    FROM usuario
+    WHERE id = :id
+    """, nativeQuery = true)
+String getName(@Param("id") Long id);
+
 }

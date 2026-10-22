@@ -3,6 +3,7 @@ package com.bruno.MyFinances.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -12,7 +13,7 @@ public class Entrada {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    private LocalDate dataRegistro;
+    private LocalDateTime dataRegistro;
     private String tipo;
     private BigDecimal valor;
     private String obs;
@@ -22,7 +23,7 @@ public class Entrada {
         
     }
 
-    public Entrada(String nome, LocalDate data, BigDecimal valor, String obs, Long id, String tipo) {
+    public Entrada(String nome, LocalDateTime data, BigDecimal valor, String obs, Long id, String tipo) {
         this.nome = nome;
         this.dataRegistro = data;
         this.valor = valor;
@@ -35,7 +36,7 @@ public class Entrada {
         return nome;
     }
 
-    public LocalDate getDataRegistro() {
+    public LocalDateTime getDataRegistro() {
         return dataRegistro;
     }
 

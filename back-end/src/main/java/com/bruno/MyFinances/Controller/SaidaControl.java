@@ -2,17 +2,26 @@ package com.bruno.MyFinances.Controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.bruno.MyFinances.service.ServiceGasto;
+import com.bruno.MyFinances.dto.SaidaCriadaResponse;
+import com.bruno.MyFinances.dto.SaidaRequest;
+import com.bruno.MyFinances.dto.SaidaResponse;
 import com.bruno.MyFinances.service.CriarSaida;
 import com.bruno.MyFinances.service.Digitacao;
 
-@Controller
+@RestController
+@RequestMapping("/api")
+
 public class SaidaControl {
 
     private final Digitacao digitar;
@@ -24,199 +33,130 @@ public class SaidaControl {
         this.criarSaidaMet = criarSaidaMet;
         this.gasto = gasto;
     }
-    
-    public void saidas() throws InterruptedException {
-        boolean sair = false;
-        while (sair == false) {
-            digitar.digitar("| INTERFACE DE SAIDAS |");
-            digitar.digitar("| 1 - Registrar saidas |");
-            digitar.digitar("| 2 - Ver gasto mensal |");
-            digitar.digitar("| 3 - Ver todos os gastos do mês |");
-            digitar.digitar("| 4 - Sair |");
-            String opcao = digitar.ler().trim();
-            switch (opcao) {
-                case "1":
-                    registrarSaidas();
-                    break;
-                case "2":
-                    consultarGasto();
-                    break;
-                case "3":
-                    verTotGastos();
-                    break;
-                case "4":
-                    sair = true;
-                    break;
-            }
-        }
-    }
+   
 
     public void verTotGastos() throws InterruptedException {
-        gasto.todosGastos();
+        //gasto.todosGastos();
     }
 
-    public void consultarGasto() throws InterruptedException {
-        List<BigDecimal> soma = gasto.gastoTotal();
+    private String token;
+    private LocalDateTime data;
+
+    @PostMapping("/dadosSaida")
+    public SaidaResponse consultarGasto(@RequestBody SaidaRequest request) {
+        token = request.getToken();
+        data = request.getData();
+        List<BigDecimal> soma = gasto.gastoTotal(token, data);
         String valorFixo = String.valueOf(soma.get(0));
         String valorVariavel = String.valueOf(soma.get(1));
         String valorInvestimentos = String.valueOf(soma.get(2));
         String valorTotal = String.valueOf(soma.get(3));
-        digitar.digitar("| GASTO MENSAL |");
-        digitar.digitar("| SAIDAS FIXAS: R$" + valorFixo + " |");
-        digitar.digitar("| SAIDAS VARIÁVEIS: R$" + valorVariavel + " |");
-        digitar.digitar("| SAIDAS VARIÁVEIS: R$" + valorInvestimentos + " |");
-        digitar.digitar("| VALOR TOTAL: R$" + valorTotal + " |");
+       
+        int  porcentagemDiferençaInt = soma.get(4).intValue();
+        String porcentagemDiferença = String.valueOf(porcentagemDiferençaInt);
+
+        return new SaidaResponse(valorFixo , valorVariavel , valorInvestimentos, valorTotal, porcentagemDiferença);
 
     }
 
-    public void registrarSaidas() throws InterruptedException {
+    @PostMapping("/salvarSaida")
+    public SaidaCriadaResponse registrarSaidas(@RequestBody SaidaRequest request) {
 
-    String nome = null;
-    LocalDate data = null;
-    String tipo = "";
-    String escolherDate;
-    BigDecimal valor = null;
-    String obs = "";
-    String EscolhaObs;
-    
+    String token = request.getToken();
+    String nome = request.getNome(); // VERIFICADO
+    LocalDateTime data = request.getData(); // JÁ VEM CORRETO
+    String tipo = ""; // RECEBE COM A FORMATAÇÃO CORRETA
+    String escolhaTipo = request.getTipo(); // VERIFICADO
+    BigDecimal valor = request.getValor(); // JÁ VEM CORRETO
+    String obs = request.getObservacao(); // VERIFICADO
+  
 
-   
-    boolean sair = false;
-
-
-
-    //metodo que pega o id do user 
-
+    String mensagemNome = "";
+    String mensagemValor = "";
+    String mensagemObs = "";
+    String mensagemSucesso = "";
         
-        while (sair == false) { 
-            boolean nomeCerto = false;
-            boolean dataCerta = false;
-            boolean tipoCerto = false;
-            boolean valorCerto = false;
-            boolean obsCerto = false;
-            digitar.digitar("| SAIDAS |");
-            digitar.digitar("| Digite 'VOLTAR' caso deseje retornar. |");
+    //
+    //  VALIDAÇÕES
+    //
 
-                while (nomeCerto == false) {
-                    digitar.digitar("Qual o nome que deseja dar a saida?");
-                    digitar.digitar("Exemplo: mercado, padaria, luz, água, investimento...");
-                    nome = digitar.ler().trim().toLowerCase();
-                    if (nome.equals("")) {
-                        digitar.digitar("Nome da saída não pode ser vazio");
-                    } else if (nome.equals("voltar")) {
-                        sair = true;
-                        break;
-                    } else {
-                        nomeCerto = true;
-                    }
-                }
+    boolean nomeCerto = false;
+    boolean valorCerto = false;
+    boolean obsCerto = false;
+    boolean saidaSalva = false;
+    
+    //
+    //  NOME
+    //
+    
+    if (nome.equals("")) {
+        mensagemNome = "O nome da saída não pode ser vazio";
+    } else if (nome.length() > 255) {
+        mensagemNome = "O nome não pode possuir mais de 255 caracteres";
+    } else {
+        nomeCerto = true;
+    }
                 
-            if (sair == false) {
-                while (dataCerta == false) {
-                        digitar.digitar("Qual a data dessa saída? Digite 'HOJE' para definir a data de agora ou 'DEFINIR' para informar a data que deseja.");
-                        escolherDate = digitar.ler().toUpperCase().trim();
-
-                        if (escolherDate.equals("HOJE")) {
-                            data = LocalDate.now();
-                            dataCerta = true;
-                        } else if (escolherDate.equals("DEFINIR")) {
-                            digitar.digitar("Digite a data da saída:");
-                            String dataDigitada = digitar.ler();
-                            try {
-                                DateTimeFormatter dataFormatada = DateTimeFormatter.ofPattern("dd/MM/yyyy");                            
-                                data = LocalDate.parse(dataDigitada, dataFormatada);
-                                dataCerta = true;
-                                    
-                            } catch (DateTimeParseException e) {
-                                    digitar.digitar("| DATA INVÁLIDA |");
-                            }
-                        } else if (escolherDate.equals("VOLTAR")) {
-                        sair = true;
-                        break;
-                        }  else {
-                            digitar.digitar("| OPÇÃO INVÁLIDA |");
-                        }
-                    }
-            }
-
-            if (sair == false) {
-                while (tipoCerto == false) {    
-                    digitar.digitar("Qual o tipo de saída? Digite '1' para FIXA e '2' para VARIÁVEL e '3' para INVESTIMENTOS");
-                    String escolhaTipo = digitar.ler().toUpperCase().trim();
-
-                    if (escolhaTipo.equals("1") || escolhaTipo.equals("FIXA")) {
-                        tipo = "FIXA";
-                        tipoCerto= true;
-                    } else if (escolhaTipo.equals("2") || escolhaTipo.equals("VARIÁVEL") || escolhaTipo.equals("VARIAVEL") ) {
-                        tipo = "VARIAVEL";
-                        tipoCerto= true;
-                    } else if (escolhaTipo.equals("3") || escolhaTipo.equals("INVESTIMENTOS")) {
-                        tipo = "INVESTIMENTOS";
-                        tipoCerto= true;
-                    } else if (escolhaTipo.equals("VOLTAR")) {
-                        sair = true;
-                        break;
-                    } else {
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
+    //
+    //  TIPO
+    //       
             
-            if (sair == false) {
-                while (valorCerto == false) {
-                    digitar.digitar("Qual o valor dessa saída?");
-                    String valorText = digitar.ler();
-                    
-                    if (valorText.matches("\\\\d+([,.]\\d{1,2})?")) {
-                        valor = new BigDecimal(valorText.replace(",", "."));
-                        valorCerto = true;
-                    } else if (valorText.equals("VOLTAR")) {
-                        sair = true;
-                        break;
-                    } else if (!valorText.matches("\\d+([,.]\\d{1,2})?")) {
-                        digitar.digitar("| Digite apenas números. |");
-                    } else {
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
+    if (escolhaTipo.equalsIgnoreCase("FIXO")) {
+        tipo = "FIXA";
+    } else if (escolhaTipo.equalsIgnoreCase("VARIAVEL")) {
+        tipo = "VARIAVEL";
+    } else if (escolhaTipo.equalsIgnoreCase("INVESTIMENTO")) {
+        tipo = "INVESTIMENTOS";
+    } 
+    
+    //
+    //  VALOR
+    //
 
-            if (sair == false) {
-                while (obsCerto == false) {
-                    digitar.digitar("Deseja colocar observações? Responda 'SIM' ou 'NÃO'");
-                    EscolhaObs = digitar.ler().toUpperCase().trim();
+    if (valor == null) {
+        mensagemValor = "O valor não pode ser vazio.";
+    } else if (valor != null) {
+        valorCerto = true;
+    }
 
-                    if (EscolhaObs.equals("SIM")) {
-                        digitar.digitar("Escreva as suas observações:");
-                        obs = digitar.ler().trim();
-                            if (obs != null && !obs.equals("")) {
-                                obsCerto = true;
-                            } else {
-                                digitar.digitar("Suas observações ficaram vazias!");
-                            }
-                    } else if (EscolhaObs.equals("NÃO") || EscolhaObs.equals("NAO")) {
-                        obs = "Sem observações";
-                        obsCerto = true;
-                    } else if (EscolhaObs.equals("VOLTAR")) {
-                        sair = true;
-                        break;
-                    } else {
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
-            // Se nenhum dado for null, chamar o service que cria saidas, este deve retornar true or false conforme o sucesso de criação enviar 'model/Saida' pro sgbd
+    //
+    //  OBSERVAÇÕES
+    //
+                 
+    if (!obs.equals("") && obs.length() <= 255) {
+        obsCerto = true;
+    } else if (obs.equals("")) {
+        obs = "Sem observações";
+        obsCerto = true;
+    } else if (obs.length() > 255) {
+        mensagemObs = "O nome não pode possuir mais de 255 caracteres";
+    }
 
-            if (!nome.isEmpty() && data != null && !tipo.isEmpty() && valor != null && !obs.isEmpty() && sair == false) {
-                criarSaidaMet.criarSaidas(nome, data, tipo, valor, obs);
-                if (criarSaidaMet.getSalvarSaida()) {
-                    digitar.digitar("| Saida registrada com sucesso! |");
-                    break;
-                } else {
-                    digitar.digitar("| Não foi possível registrar essa saida. Tente novamente. |");
-                } 
-            }
+    //
+    //  SALVAR SAIDA
+    //  
+        
+    if (!nome.isEmpty() && data != null && !tipo.isEmpty() && valor != null && !obs.isEmpty()) {
+        criarSaidaMet.criarSaidas(nome, data, tipo, valor, obs, token);
+        if (criarSaidaMet.getSalvarSaida()) {
+            mensagemSucesso = "Saida registrada com sucesso!"; 
+            saidaSalva = true;
+        } else {
+            mensagemSucesso = "Não foi possível registrar essa saida. Tente novamente.";
+        } 
+    }
+
+    return new SaidaCriadaResponse(
+    mensagemNome,
+    mensagemValor,
+    mensagemObs,
+    mensagemSucesso,
+    nomeCerto,
+    valorCerto,
+    obsCerto,
+    saidaSalva
+    );
 
         }    
     }
-}
+

@@ -10,22 +10,22 @@ import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.bruno.MyFinances.dto.EntradaCriadaResponse;
 import com.bruno.MyFinances.dto.EntradaRequest;
 import com.bruno.MyFinances.dto.EntradaResponse;
-import com.bruno.MyFinances.service.CriarEntradas;
 import com.bruno.MyFinances.service.ServiceEntrada;
 import com.bruno.MyFinances.service.Digitacao;
 
-@Controller
+@RestController
+@RequestMapping("/api")
+
 public class EntradaControl {
-    private final Digitacao digitar;
-    private final CriarEntradas CriarEntradas;
     private final ServiceEntrada serviceEntradas;
 
-    public EntradaControl(Digitacao digitacao, CriarEntradas CriarEntradas, ServiceEntrada serviceEntradas) {
-        this.digitar = digitacao;
-        this.CriarEntradas = CriarEntradas;
+    public EntradaControl(ServiceEntrada serviceEntradas) {
         this.serviceEntradas = serviceEntradas;
     }
 
@@ -37,256 +37,163 @@ public class EntradaControl {
     }
 
     @PostMapping("/dadosEntrada")
-    public EntradaResponse entradasCont(@RequestBody EntradaRequest request) throws InterruptedException {
+    public EntradaResponse dadosEntrada(@RequestBody EntradaRequest request) {
         token = request.getToken();
         data = request.getData();
+
         List<BigDecimal> soma = serviceEntradas.entradaTotal(token, data);
         String valorSalario = String.valueOf(soma.get(0));
         String valorExtra = String.valueOf(soma.get(1));
         String valorRendimento = String.valueOf(soma.get(2));
         String valorTotal = String.valueOf(soma.get(3));
-        digitar.digitar("| GASTO MENSAL |");
-        digitar.digitar("| SALÁRIO: R$" + valorSalario + " |");
-        digitar.digitar("| ENTRADA EXTRA: R$" + valorExtra + " |");
-        digitar.digitar("| SAIDAS RENDIMENTOS DE INVESTIMENTO: R$" + valorRendimento + " |");
-        digitar.digitar("| VALOR TOTAL: R$" + valorTotal + " |");
 
-        return new EntradaResponse(valorSalario , valorExtra , valorRendimento, valorTotal);
+        int  porcentagemDiferençaInt = soma.get(4).intValue();
+        String porcentagemDiferença = String.valueOf(porcentagemDiferençaInt);
+
+        return new EntradaResponse(valorSalario , valorExtra , valorRendimento, valorTotal, porcentagemDiferença);
 
     }
 
-    public void registarEntradas() throws InterruptedException {
+    @PostMapping("/salvarEntrada")
+public EntradaCriadaResponse registrarEntradas(
+        @RequestBody EntradaRequest request) {
 
-        String nome = null;
-        LocalDate data = null;
-        String tipo = "";
-        String escolherDate;
-        BigDecimal valor = null;
-        String obs = "";
-        String EscolhaObs;
+    String token = request.getToken();
 
-        boolean sair = false;
+    String nome = request.getNome(); // VERIFICADO
 
-        // metodo que pega o id do user
+    LocalDateTime data = request.getData(); // JÁ VEM CORRETO
 
-        while (sair == false) {
+    String tipo = ""; // RECEBE COM A FORMATAÇÃO CORRETA
+    String escolhaTipo = request.getTipo(); // VERIFICADO
 
-            boolean nomeCerto = false;
-            boolean dataCerta = false;
-            boolean tipoCerto = false;
-            boolean valorCerto = false;
-            boolean obsCerto = false;
+    BigDecimal valor = request.getValor(); // JÁ VEM CORRETO
 
-            digitar.digitar("| ENTRADA |");
-            digitar.digitar("| Digite 'VOLTAR' caso deseje retornar. |");
+    String obs = request.getObservacao(); // VERIFICADO
 
-            // NOME
-            while (nomeCerto == false) {
+    String mensagemNome = "";
+    String mensagemValor = "";
+    String mensagemObs = "";
+    String mensagemSucesso = "";
 
-                digitar.digitar("Qual o nome que deseja dar a entrada?");
-                digitar.digitar("Exemplo: salário, renda extra, rendimento...");
+    //
+    // VALIDAÇÕES
+    //
 
-                nome = digitar.ler().trim().toLowerCase();
+    boolean nomeCerto = false;
+    boolean valorCerto = false;
+    boolean obsCerto = false;
+    boolean entradaSalva = false;
 
-                if (nome.equals("")) {
-                    digitar.digitar("Nome da entrada não pode ser vazio");
+    //
+    // NOME
+    //
 
-                } else if (nome.equals("voltar")) {
-                    sair = true;
-                    break;
+    if (nome == null || nome.equals("")) {
 
-                } else {
-                    nomeCerto = true;
-                }
-            }
+        mensagemNome = "O nome da entrada não pode ser vazio";
 
-            // DATA
-            if (sair == false) {
+    } else if (nome.length() > 255) {
 
-                while (dataCerta == false) {
+        mensagemNome = "O nome não pode possuir mais de 255 caracteres";
 
-                    digitar.digitar(
-                        "Qual a data dessa entrada? Digite 'HOJE' para definir a data de agora ou 'DEFINIR' para informar a data que deseja."
-                    );
+    } else {
 
-                    escolherDate = digitar.ler().toUpperCase().trim();
+        nomeCerto = true;
+    }
 
-                    if (escolherDate.equals("HOJE")) {
+    //
+    // TIPO
+    //
 
-                        data = LocalDate.now();
-                        dataCerta = true;
+    if (escolhaTipo != null) {
 
-                    } else if (escolherDate.equals("DEFINIR")) {
+        if (escolhaTipo.equalsIgnoreCase("SALARIO")
+                || escolhaTipo.equalsIgnoreCase("SALÁRIO")) {
 
-                        digitar.digitar("Digite a data da entrada:");
+            tipo = "SALARIO";
 
-                        String dataDigitada = digitar.ler();
+        } else if (escolhaTipo.equalsIgnoreCase("EXTRA")) {
 
-                        try {
+            tipo = "EXTRA";
 
-                            DateTimeFormatter dataFormatada =
-                                    DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        } else if (escolhaTipo.equalsIgnoreCase("RENDIMENTO")) {
 
-                            data = LocalDate.parse(dataDigitada, dataFormatada);
-                            dataCerta = true;
-
-                        } catch (DateTimeParseException e) {
-
-                            digitar.digitar("| DATA INVÁLIDA |");
-                        }
-
-                    } else if (escolherDate.equals("VOLTAR")) {
-
-                        sair = true;
-                        break;
-
-                    } else {
-
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
-
-            // TIPO
-            if (sair == false) {
-
-                while (tipoCerto == false) {
-
-                    digitar.digitar(
-                        "Qual o tipo de entrada? Digite '1' para SALÁRIO e '2' para EXTRA e '3' para RENDIMENTOS"
-                    );
-
-                    String escolhaTipo = digitar.ler().toUpperCase().trim();
-
-                    if (escolhaTipo.equals("1")
-                            || escolhaTipo.equals("SALÁRIO")
-                            || escolhaTipo.equals("SALARIO")) {
-
-                        tipo = "SALARIO";
-                        tipoCerto = true;
-
-                    } else if (escolhaTipo.equals("2")
-                            || escolhaTipo.equals("EXTRA")) {
-
-                        tipo = "RENDIMENTOS";
-                        tipoCerto = true;
-
-                    } else if (escolhaTipo.equals("3")
-                            || escolhaTipo.equals("RENDIMENTOS")) {
-
-                        tipo = "RENDIMENTOS";
-                        tipoCerto = true;
-
-                    } else if (escolhaTipo.equals("VOLTAR")) {
-
-                        sair = true;
-                        break;
-
-                    } else {
-
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
-
-            // VALOR
-            if (sair == false) {
-
-                while (valorCerto == false) {
-
-                    digitar.digitar("Qual o valor dessa entrada?");
-
-                    String valorText = digitar.ler();
-
-                    if (valorText.matches("\\d+")) {
-
-                        valor = new BigDecimal(valorText);
-                        valorCerto = true;
-
-                    } else if (valorText.equalsIgnoreCase("VOLTAR")) {
-
-                        sair = true;
-                        break;
-
-                    } else {
-
-                        digitar.digitar("| Digite apenas números. |");
-                    }
-                }
-            }
-
-            // OBSERVAÇÕES
-            if (sair == false) {
-
-                while (obsCerto == false) {
-
-                    digitar.digitar(
-                        "Deseja colocar observações? Responda 'SIM' ou 'NÃO'"
-                    );
-
-                    EscolhaObs = digitar.ler().toUpperCase().trim();
-
-                    if (EscolhaObs.equals("SIM")) {
-
-                        digitar.digitar("Escreva as suas observações:");
-
-                        obs = digitar.ler().trim();
-
-                        if (obs != null && !obs.equals("")) {
-
-                            obsCerto = true;
-
-                        } else {
-
-                            digitar.digitar("Suas observações ficaram vazias!");
-                        }
-
-                    } else if (EscolhaObs.equals("NÃO")
-                            || EscolhaObs.equals("NAO")) {
-
-                        obs = "Sem observações";
-                        obsCerto = true;
-
-                    } else if (EscolhaObs.equals("VOLTAR")) {
-
-                        sair = true;
-                        break;
-
-                    } else {
-
-                        digitar.digitar("| OPÇÃO INVÁLIDA |");
-                    }
-                }
-            }
-
-            // CRIAÇÃO DA ENTRADA
-            if (!nome.isEmpty()
-                    && data != null
-                    && !tipo.isEmpty()
-                    && valor != null
-                    && !obs.isEmpty()
-                    && sair == false) {
-
-                serviceEntradas.criarEntradas(
-                    nome,
-                    data,
-                    valor,
-                    obs,
-                    tipo
-                );
-
-                if (serviceEntradas.getEntradaSalva()) {
-
-                    digitar.digitar("| Entrada registrada com sucesso! |");
-                    break;
-
-                } else {
-
-                    digitar.digitar(
-                        "| Não foi possível registrar essa entrada. Tente novamente. |"
-                    );
-                }
-            }
+            tipo = "RENDIMENTOS";
         }
+    }
+
+    //
+    // VALOR
+    //
+
+    if (valor == null) {
+
+        mensagemValor = "O valor não pode ser vazio.";
+
+    } else {
+
+        valorCerto = true;
+    }
+
+    //
+    // OBSERVAÇÕES
+    //
+
+    if (obs == null || obs.equals("")) {
+
+        obs = "Sem observações";
+        obsCerto = true;
+
+    } else if (obs.length() <= 255) {
+
+        obsCerto = true;
+
+    } else if (obs.length() > 255) {
+
+        mensagemObs = "A observação não pode possuir mais de 255 caracteres";
+    }
+
+    //
+    // SALVAR ENTRADA
+    //
+
+    if (nomeCerto
+            && data != null
+            && !tipo.isEmpty()
+            && valorCerto
+            && obsCerto) {
+
+        serviceEntradas.criarEntradas(
+                nome,
+                data,
+                valor,
+                obs,
+                tipo,
+                token
+        );
+
+        if (serviceEntradas.getEntradaSalva()) {
+
+            mensagemSucesso = "Entrada registrada com sucesso!";
+            entradaSalva = true;
+
+        } else {
+
+            mensagemSucesso =
+                    "Não foi possível registrar essa entrada. Tente novamente.";
+        }
+    }
+
+        return new EntradaCriadaResponse(
+                mensagemNome,
+                mensagemValor,
+                mensagemObs,
+                mensagemSucesso,
+                nomeCerto,
+                valorCerto,
+                obsCerto,
+                entradaSalva
+        );
     }
 }

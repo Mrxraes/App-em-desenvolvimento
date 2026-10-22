@@ -162,7 +162,11 @@ import java.util.ArrayList;
                 
         System.out.println(email + " 4 " + senha);
         System.out.println(passarPag);
-        boolean perfilAtivo = repositorio.perfilAtivo(emailFormatado);
+        boolean perfilAtivo = false;
+
+        if (emailExiste.equals("1")) {
+            perfilAtivo = repositorio.perfilAtivo(emailFormatado);
+        }
 
         return new LoginResponse(
             passarPag,

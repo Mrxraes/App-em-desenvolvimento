@@ -2,6 +2,7 @@ package com.bruno.MyFinances.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -14,7 +15,7 @@ public class Saida {
     private String nome;
 
     @Column(name = "DataRegistro", nullable = false)
-    private LocalDate  dataRegistro;
+    private LocalDateTime  dataRegistro;
 
     private String tipo; // Declarada no tipo Class, e so aceita valores iguais ao TipoSaida. 
 
@@ -28,7 +29,7 @@ public class Saida {
         
     }
 
-    public Saida(String nome, LocalDate registro, String tipo, BigDecimal valor, String obs, Long id) {
+    public Saida(String nome, LocalDateTime registro, String tipo, BigDecimal valor, String obs, Long id) {
         this.nome = nome;
         this.dataRegistro = registro;
         this.tipo = tipo;
@@ -41,7 +42,7 @@ public class Saida {
         return nome;
     }
 
-    public LocalDate getDataRegistro() {
+    public LocalDateTime getDataRegistro() {
         return dataRegistro;
     }
 

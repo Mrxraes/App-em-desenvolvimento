@@ -11,7 +11,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.bruno.MyFinances.models.Entrada;
-import com.bruno.MyFinances.models.Usuario;
 import com.bruno.MyFinances.repository.EntradaRepository;
 import com.bruno.MyFinances.repository.TokenLoginRepository;
 import com.bruno.MyFinances.repository.UsuarioRepository;
@@ -40,6 +39,7 @@ public class ServiceEntrada {
         BigDecimal valoresExtra = repoEntrada.valoresExtra(id, data);
         BigDecimal valoresRendimento = repoEntrada.valoresRendimentos(id, data);
         BigDecimal valorTotal = repoEntrada.contarValores(id, data); 
+        BigDecimal valueMonthBefore = repoEntrada.contarValores(id, data.minusMonths(1)); 
         if (valoresSalario == null) {
             valoresSalario = BigDecimal.valueOf(0);
         } if (valoresExtra == null) {
@@ -48,12 +48,29 @@ public class ServiceEntrada {
             valoresRendimento = BigDecimal.valueOf(0);
         } if (valorTotal == null) {
             valorTotal = BigDecimal.valueOf(0);
+        } if (valueMonthBefore == null) {
+            valueMonthBefore = BigDecimal.valueOf(0);
         }
+
+        BigDecimal porcentagemDiferençaBig = null;
+
+        if (valueMonthBefore == BigDecimal.valueOf(0) && valorTotal == BigDecimal.valueOf(0)) {
+            porcentagemDiferençaBig = new BigDecimal(0);
+        } else if (valueMonthBefore == BigDecimal.valueOf(0) && valorTotal != BigDecimal.valueOf(0)) {
+            porcentagemDiferençaBig = valorTotal;
+        } else {
+            Double porcentagemDiferença = 
+            (valorTotal.doubleValue() - valueMonthBefore.doubleValue()) 
+            / valueMonthBefore.doubleValue() * 100;
+            porcentagemDiferençaBig = new BigDecimal(porcentagemDiferença);   
+        }
+
         entradasDivididos.add(valoresSalario);
         entradasDivididos.add(valoresExtra);
         entradasDivididos.add(valoresRendimento);
         entradasDivididos.add(valorTotal);
-        System.out.println(entradasDivididos);
+        entradasDivididos.add(porcentagemDiferençaBig);
+
         return entradasDivididos;
     }
 
@@ -66,7 +83,7 @@ public class ServiceEntrada {
 
             String nome = entrada.getNome();
 
-            LocalDate data = entrada.getDataRegistro();
+            LocalDateTime data = entrada.getDataRegistro();
             DateTimeFormatter dataFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String dataPrint =  data.format(dataFormat);
 
@@ -82,9 +99,8 @@ public class ServiceEntrada {
 
      private boolean sucesso;
 
-    public void criarEntradas(String nome, LocalDate data, BigDecimal valor, String obs, String tipo) {
-        String pegarEmail = email.getEmail();
-        Long fk = repoUsuario.pegarId(pegarEmail);
+    public void criarEntradas(String nome, LocalDateTime data, BigDecimal valor, String obs, String tipo, String token) {
+        Long fk = tokenLoginRepositorio.getId(token);
         Entrada criar = new Entrada(nome, data, valor, obs, fk, tipo);
         try {
             repoEntrada.save(criar);
