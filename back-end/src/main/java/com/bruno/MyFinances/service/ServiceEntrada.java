@@ -39,7 +39,7 @@ public class ServiceEntrada {
         BigDecimal valoresExtra = repoEntrada.valoresExtra(id, data);
         BigDecimal valoresRendimento = repoEntrada.valoresRendimentos(id, data);
         BigDecimal valorTotal = repoEntrada.contarValores(id, data); 
-        BigDecimal valueMonthBefore = repoEntrada.contarValores(id, data.minusMonths(1)); 
+        BigDecimal valueMonthBefore = repoEntrada.contarValoresMesAnterior(id, data.minusMonths(1)); 
         if (valoresSalario == null) {
             valoresSalario = BigDecimal.valueOf(0);
         } if (valoresExtra == null) {

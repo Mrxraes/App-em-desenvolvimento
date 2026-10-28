@@ -68,7 +68,7 @@ function formatarCategoria(tipo: string): string {
     FIXO: 'Fixo',
     FIXA: 'Fixo',
     VARIAVEL: 'Variável',
-    INVESTIMENTO: 'Investimento',
+    INVESTIMENTOS: 'Investimento',
     ALIMENTACAO: 'Alimentação',
     TRANSPORTE: 'Transporte',
     LAZER: 'Lazer',
@@ -199,7 +199,9 @@ export default function HomeScreen() {
 
   useEffect(() => {
     getName().catch((error) => console.error('Erro ao buscar nome:', error));
-  }, [getName]);
+    carregarDashboard();
+
+  }, [getName, dataReferencia, data,entradasValorTotal, saidasValorTotal]);
 
   useFocusEffect(useCallback(() => {
     carregarDashboard();
@@ -216,6 +218,15 @@ export default function HomeScreen() {
   function verTodasMovimentacoes() {
     router.push({ pathname: '/Transacoes', params: { token: tokenAtual } });
   }
+
+  function relatorios() {
+    router.push({ pathname: '/Relatorios', params: { token: tokenAtual} });
+  }
+
+  function gerenciarTransacoes() {
+    router.push({ pathname: '/Transacoes', params: { token: tokenAtual,  modoGerenciamento: "true"  } });
+  }
+
 
   function selecionarData(event: { type: string }, selectedDate?: Date) {
     setMostrarPicker(false);
@@ -373,7 +384,15 @@ export default function HomeScreen() {
               <Text style={styles.textMethod}>receita</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.blockMethod} onPress={() => {}}>
+            <TouchableOpacity style={styles.blockMethod} onPress={gerenciarTransacoes}>
+              <View style={styles.methodIcon}>
+                <Ionicons name="grid-outline" size={24} color={Colors.primary} />
+              </View>
+              <Text style={styles.textMethod}>Gerenciar</Text>
+              <Text style={styles.textMethod}>Transações</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.blockMethod} onPress={relatorios}>
               <View style={styles.methodIcon}>
                 <Ionicons name="bar-chart-outline" size={24} color={Colors.primary} />
               </View>
@@ -381,13 +400,6 @@ export default function HomeScreen() {
               <Text style={styles.textMethod}>relatórios</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.blockMethod} onPress={() => {}}>
-              <View style={styles.methodIcon}>
-                <Ionicons name="grid-outline" size={24} color={Colors.primary} />
-              </View>
-              <Text style={styles.textMethod}>Minhas</Text>
-              <Text style={styles.textMethod}>categorias</Text>
-            </TouchableOpacity>
           </View>
 
           {/* ÚLTIMAS MOVIMENTAÇÕES */}

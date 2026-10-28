@@ -9,9 +9,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bruno.MyFinances.dto.MovimentacaoRequest;
+import com.bruno.MyFinances.dto.TodasMovimentacaoResponse;
 import com.bruno.MyFinances.dto.MovimentacaoResponse;
 import com.bruno.MyFinances.dto.TodasMovimentacoesResponse;
 import com.bruno.MyFinances.service.MovimentacoesService;
+import com.bruno.MyFinances.dto.AlterarMovimentacaoRequest;
+import com.bruno.MyFinances.dto.RemoverMovimentacaoRequest;
+import com.bruno.MyFinances.dto.OperacaoMovimentacaoResponse;
+
 
 @RestController
 @RequestMapping("/api")
@@ -38,5 +43,19 @@ public class Movimentacoes {
         String token = request.getToken();
         LocalDateTime data = request.getData();
         return moveService.buscarTodasMovimentacoes(token, data);
+    }
+
+    @PostMapping("/removerMovimentacao")
+    public OperacaoMovimentacaoResponse removerMovimentacao(
+            @RequestBody RemoverMovimentacaoRequest request
+    ) {
+        return moveService.removerMovimentacao(request);
+    }
+
+    @PostMapping("/alterarMovimentacao")
+    public OperacaoMovimentacaoResponse alterarMovimentacao(
+            @RequestBody AlterarMovimentacaoRequest request
+    ) {
+        return moveService.alterarMovimentacao(request);
     }
 }

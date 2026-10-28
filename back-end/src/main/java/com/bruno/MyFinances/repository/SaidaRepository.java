@@ -37,6 +37,19 @@ public interface SaidaRepository extends JpaRepository<Saida, Long> {
         @Param("data") LocalDateTime data
     );
 
+     @Query(value = """
+        SELECT SUM(valor)
+        FROM saida
+        WHERE fk_user = :fk_user
+          AND tipo = 'INVESTIMENTOS'
+          AND data_registro >= DATEFROMPARTS(YEAR(:data), MONTH(:data), 1)
+          AND data_registro < DATEADD(MONTH, 1, (DATEFROMPARTS(YEAR(:data), MONTH(:data), 1)))
+        """, nativeQuery = true)
+    BigDecimal contarValoresBeforeMonthInvestimentos(
+        @Param("fk_user") Long fk_user,
+        @Param("data") LocalDateTime data
+    );
+
     // Total de saídas fixas no período
     @Query(value = """
         SELECT SUM(valor)

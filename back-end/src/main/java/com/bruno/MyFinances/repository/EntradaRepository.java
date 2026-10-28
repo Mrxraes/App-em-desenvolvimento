@@ -25,6 +25,17 @@ public interface EntradaRepository extends JpaRepository<Entrada, Long> {
         @Param("data") LocalDateTime data
     );
 
+    @Query(value = """
+        SELECT SUM(valor)
+        FROM entrada
+        WHERE fk_user = :fk_user
+          AND data_registro >= DATEFROMPARTS(YEAR(:data), MONTH(:data), 1)
+          AND data_registro < DATEADD(MONTH, 1, DATEFROMPARTS(YEAR(:data), MONTH(:data), 1));
+        """, nativeQuery = true)
+    BigDecimal contarValoresMesAnterior(
+        @Param("fk_user") Long fk_user,
+        @Param("data") LocalDateTime data
+    );
     // Soma os salários do período
     @Query(value = """
         SELECT SUM(valor)

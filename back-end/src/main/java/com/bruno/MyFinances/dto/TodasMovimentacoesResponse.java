@@ -1,26 +1,35 @@
-
 package com.bruno.MyFinances.dto;
 
 public class TodasMovimentacoesResponse {
 
+    private Long id;
     private String nome;
     private String dataRegistro;
     private String valor;
     private String tipo;
     private String tabela;
+    private String obs;
 
     public TodasMovimentacoesResponse(
+            Long id,
             String nome,
             String dataRegistro,
             String valor,
             String tipo,
-            String tabela
+            String tabela,
+            String obs
     ) {
+        this.id = id;
         this.nome = nome;
         this.dataRegistro = dataRegistro;
         this.valor = valor;
         this.tipo = tipo;
         this.tabela = tabela;
+        this.obs = obs;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNome() {
@@ -42,5 +51,8 @@ public class TodasMovimentacoesResponse {
     public String getTabela() {
         return tabela;
     }
-}
 
+    public String getObs() {
+        return obs;
+    }
+}

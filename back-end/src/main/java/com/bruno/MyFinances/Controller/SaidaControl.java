@@ -34,9 +34,15 @@ public class SaidaControl {
         this.gasto = gasto;
     }
    
+    @PostMapping("/dadosInvestimentoBefore")
+    public SaidaResponse investimentosMonth(@RequestBody SaidaRequest request) throws InterruptedException {
+        token = request.getToken();
+        data = request.getData();
+        String investimentos = String.valueOf(gasto.investimentosBeforeMonth(token, data));
 
-    public void verTotGastos() throws InterruptedException {
-        //gasto.todosGastos();
+        System.out.println(investimentos);
+
+        return new SaidaResponse("0", "0", investimentos, "0", "0");
     }
 
     private String token;

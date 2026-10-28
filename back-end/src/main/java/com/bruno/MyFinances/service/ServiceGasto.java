@@ -70,6 +70,18 @@ public class ServiceGasto {
         return gastosDivididos;
     }
 
+    public BigDecimal investimentosBeforeMonth(String token, LocalDateTime data) {
+        Long id =  tokenLoginRepositorio.getId(token);
+
+         BigDecimal valueMonthBefore = repoSaida.contarValoresBeforeMonthInvestimentos(id, data.minusMonths(1));
+
+         if (valueMonthBefore == null) {
+            valueMonthBefore = BigDecimal.valueOf(0);
+        }
+
+        return valueMonthBefore;
+    }
+
     /* 
     public void todosGastos() throws InterruptedException {
         
