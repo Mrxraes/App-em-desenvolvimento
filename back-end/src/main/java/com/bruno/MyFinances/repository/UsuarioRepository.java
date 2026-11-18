@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,12 +38,18 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
         """, nativeQuery = true)
         String consultarNome(@Param("email") String email);
 
-    @Modifying // Informa ao spring que isso faz uma modificação no banco de dados e não é apenas um select
-    @Transactional // Se a operação nao ocorrer da forma correta ele corta tudo
+    @Modifying
+    @Transactional
     @Query(value = """
-            INSERT INTO codigoTemporario (cod, dataCriada) VALUES (:codigo, :dataCriada)
-            """, nativeQuery = true)  
-    int inserirCod(@Param("codigo") String codigo,  @Param("dataCriada") LocalDate dataCriada); 
+        INSERT INTO codigoTemporario (cod, dataCriada, fk_user, finalidade, usado)
+        VALUES (:codigo, :dataCriada, :fk_user, :finalidade, 0)
+        """, nativeQuery = true)
+    int inserirCod(
+        @Param("codigo") String codigo,
+        @Param("dataCriada") LocalDateTime dataCriada,
+        @Param("fk_user") BigInteger fk_user,
+        @Param("finalidade") String finalidade
+    ); 
 
     // PEGA O CODIGO DESSA TABELA
     @Query(value = """
@@ -99,4 +106,142 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     """, nativeQuery = true)
 String getName(@Param("id") Long id);
 
+        @Query(value = """
+    SELECT
+        nome_primeiro,
+        sobrenome,
+        email,
+        data_nascimento,
+        salario
+    FROM usuario
+    WHERE id = :id
+    """, nativeQuery = true)
+List<Object[]> carregarDadosPessoais(@Param("id") Long id);
+
+    // CÓDIGO VALIDO
+    @Query(value = """
+    SELECT COUNT(*)
+    FROM codigoTemporario
+    WHERE fk_user = :id
+    AND cod = :codigo
+    AND usado = 0
+    AND finalidade = :finalidade
+    AND dataCriada <= GETDATE()
+    AND DATEADD(MINUTE, 10, dataCriada) >= GETDATE()
+    """, nativeQuery = true)
+    int contarCodigoValido(
+        @Param("id") Long id,
+        @Param("codigo") String codigo,
+        @Param("finalidade") String finalidade
+    );
+
+    @Modifying
+    @Query(value = """
+        UPDATE codigoTemporario
+        SET usado = 1
+        WHERE fk_user = :id
+        AND cod = :codigo
+        AND usado = 0
+        AND finalidade = :finalidade
+        """, nativeQuery = true)
+    int marcarCodigoComoUsado(
+        @Param("id") Long id,
+        @Param("codigo") String codigo,
+        @Param("finalidade") String finalidade
+    );
+
+    // INVALIDAR CÓDIGO UTILIZADO
+    @Modifying
+    @Query(value = """
+        DELETE FROM codigoTemporario
+        WHERE fk_user = :fk_user
+        AND cod = :codigo
+        """, nativeQuery = true)
+    int invalidarCodigo(
+            @Param("fk_user") Long fk_user,
+            @Param("codigo") String codigo
+    );
+
+            // ATUALIZAR NOME
+        @Modifying
+        @Query(value = """
+            UPDATE usuario
+            SET nome_primeiro = :novoValor
+            WHERE id = :idUser
+            """, nativeQuery = true)
+        int atualizarNome(
+                @Param("idUser") Long idUser,
+                @Param("novoValor") String novoValor
+        );
+
+
+        // ATUALIZAR SOBRENOME
+        @Modifying
+        @Query(value = """
+            UPDATE usuario
+            SET sobrenome = :novoValor
+            WHERE id = :idUser
+            """, nativeQuery = true)
+        int atualizarSobrenome(
+                @Param("idUser") Long idUser,
+                @Param("novoValor") String novoValor
+        );
+
+
+        // ATUALIZAR EMAIL
+        @Modifying
+        @Query(value = """
+            UPDATE usuario
+            SET email = :novoValor
+            WHERE id = :idUser
+            """, nativeQuery = true)
+        int atualizarEmail(
+                @Param("idUser") Long idUser,
+                @Param("novoValor") String novoValor
+        );
+
+
+        // ATUALIZAR DATA DE NASCIMENTO
+        @Modifying
+        @Query(value = """
+            UPDATE usuario
+            SET data_nascimento = :novoValor
+            WHERE id = :idUser
+            """, nativeQuery = true)
+        int atualizarDataNascimento(
+                @Param("idUser") Long idUser,
+                @Param("novoValor") String novoValor
+        );
+
+
+        // ATUALIZAR SALÁRIO
+        @Modifying
+        @Query(value = """
+            UPDATE usuario
+            SET salario = :novoValor
+            WHERE id = :idUser
+            """, nativeQuery = true)
+        int atualizarSalario(
+                @Param("idUser") Long idUser,
+                @Param("novoValor") String novoValor
+        );
+
+        @Query(value = """
+        SELECT senha
+        FROM usuario
+        WHERE id = :id
+        """, nativeQuery = true)
+    String consultarSenhaPorId(@Param("id") Long id);
+
+    @Modifying
+    @Query(value = """
+        UPDATE usuario
+        SET senha = :senha
+        WHERE id = :id
+        """, nativeQuery = true)
+    int atualizarSenha(
+        @Param("id") Long id,
+        @Param("senha") String senha
+    );
+        
 }

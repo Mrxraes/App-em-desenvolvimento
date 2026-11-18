@@ -33,7 +33,7 @@ import com.bruno.MyFinances.repository.UsuarioRepository;
 
         public boolean validaSenha(String senha, String senhaConfirm) throws InterruptedException {
             String mensagemParam = "";
-            System.out.println("Estamos aqui");
+            System.out.println("validando senha");
             System.out.println(senha);
             System.out.println(senhaConfirm);
             boolean maiuscula = false;

@@ -417,14 +417,7 @@ type saidasDados = {
                 contentContainerStyle={styles.scrollContent}
             >
                 <View style={[styles.headerTop, {   marginTop: 20 }]}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        accessibilityRole="button"
-                        accessibilityLabel="Voltar"
-                        onPress={() => router.back()}
-                    >
-                        <Ionicons name="chevron-back" size={22} color={Colors.text} />
-                    </TouchableOpacity>
+                   
                     <View style={styles.headerTitles}>
                         <Text style={styles.headerTextTitle}>Relatórios</Text>
                         <Text style={styles.headerTextSubTitle}>Acompanhe sua vida financeira</Text>
@@ -656,12 +649,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,
+        paddingTop: 25
     },
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 18,
-        paddingTop: 18,
-        paddingBottom: 32,
+
     },
     headerTop: {
         flexDirection: 'row',

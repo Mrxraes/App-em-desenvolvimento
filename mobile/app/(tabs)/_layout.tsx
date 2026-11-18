@@ -16,7 +16,7 @@ export default function TabLayout() {
     // stack cria uma sobreposição
 
     <DataProvider>
-      <Tabs  initialRouteName="index" screenOptions={{
+      <Tabs screenOptions={{
           headerShown: false,
           animation: "fade",
       
@@ -29,7 +29,7 @@ export default function TabLayout() {
               <Ionicons
                 name="home"
                 size={size}
-                color={color}
+                color={String(color)}
               />
             )
           }}>
@@ -41,7 +41,7 @@ export default function TabLayout() {
               <Ionicons
                 name="swap-horizontal-outline"
                 size={size}
-                color={color}
+                color={String(color)}
               />
             )
           }}>
@@ -53,18 +53,18 @@ export default function TabLayout() {
               <Ionicons
                 name="pie-chart-outline"
                 size={size}
-                color={color}
+                color={String(color)}
               />
             )
           }}>
           </Tabs.Screen>
-          <Tabs.Screen name="Categorias"
+          <Tabs.Screen name="Configuracoes"
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons
-                name="grid-outline"
+                name="settings-outline"
                 size={size}
-                color={color}
+                color={String(color)}
               />
             )
           }}>

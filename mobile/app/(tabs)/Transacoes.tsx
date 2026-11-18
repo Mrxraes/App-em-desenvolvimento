@@ -1736,12 +1736,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: CORES.background,
+        paddingTop: 25
     },
 
     conteudo: {
         padding: 20,
         paddingBottom: 40,
-        marginTop: 25
     },
 
     cabecalho: {

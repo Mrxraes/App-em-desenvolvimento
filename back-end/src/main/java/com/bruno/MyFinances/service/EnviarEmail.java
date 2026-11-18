@@ -9,6 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender; // conversa com o servi
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
 
@@ -136,6 +137,42 @@ public class EnviarEmail {
        return envio;
     }
 
+    public void enviarEmailAlteracao(
+        String codigo,
+        String email,
+        String campo,
+        String nome
+    ) throws MessagingException  {
+
+    MimeMessage mensagem = emailSender.createMimeMessage();
+
+    MimeMessageHelper helper = new MimeMessageHelper(
+            mensagem,
+            true,
+            "UTF-8"
+    );
+
+    helper.setTo(email);
+    helper.setSubject("Código de confirmação de alteração");
+
+    helper.setText(
+            "<html>" +
+            "<body>" +
+            "<p>Olá, " + nome + "!</p>" +
+            "<p>Recebemos uma solicitação para alterar seus dados pessoais.</p>" +
+            "<p>O campo solicitado foi: <strong>" + campo.toUpperCase() + "</strong>.</p>" +
+            "<p>Para confirmar essa alteração, utilize o código abaixo:</p>" +
+            "<h2>" + codigo + "</h2>" +
+            "</body>" +
+            "</html>",
+            true
+    );
+
+    helper.setFrom("My Finances <myfinancesdoisfatores@gmail.com>");
+
+    emailSender.send(mensagem);
+
+    }
 }
 
 

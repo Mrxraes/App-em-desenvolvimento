@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -192,10 +193,8 @@ import java.util.ArrayList;
 
         if (loginSucedido && perfilAtivo) {
             // criar Token que sera salvo no celular para requisitar e verificar que aquele usuario ja possui login
-            tokenMethods.criarTokenLogin(emailFormatado);
+            token = tokenMethods.criarTokenLogin(emailFormatado);
             Long id = repositorio.pegarId(emailFormatado);
-            token = tokenLoginRepositorio.getToken(id);
-            System.out.println(token + "validarEmail");
         }
 
         return new ValidationResponse(loginSucedido, mensagem, perfilAtivo, token);
@@ -209,9 +208,11 @@ import java.util.ArrayList;
         Boolean senhaIguais = getSenhasIguais();
             if (emailExiste.equals("1") && senhaIguais == true) {
                 String primeiro_nome = repositorio.consultarNome(emailFormatado);
+                Long id = repositorio.pegarId(emailFormatado);
                 String codigo = cod.criarCod();
                 LocalDateTime criadoHora = LocalDateTime.now();
-                repositorio.inserirCod(codigo, criadoHora.toLocalDate());
+                String finalidade = "AUTENTICACAO";
+                repositorio.inserirCod(codigo, criadoHora, BigInteger.valueOf(id), finalidade);
                 System.out.println(criadoHora);
                 setCodeHora(criadoHora); 
                 enviarEmail.enviarEmailAutenticacao(codigo, emailFormatado, "login", primeiro_nome);

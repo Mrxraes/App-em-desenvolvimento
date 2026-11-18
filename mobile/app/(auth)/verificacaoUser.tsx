@@ -6,6 +6,7 @@ import { useFonts } from '@expo-google-fonts/poppins'
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
 
 import * as SecureStore from "expo-secure-store"
 
@@ -19,13 +20,12 @@ export default function verificacaoEmail() {
     const [ numberTF, setNumberTF ] = useState(true)
     const [ tempoReenvioCod, setTempoReenvioCod ] = useState(0) 
 
-    const input1 = useRef<TextInput>(null);
-    const input2 = useRef<TextInput>(null);
-    const input3 = useRef<TextInput>(null);
-    const input4 = useRef<TextInput>(null);
-    const input5 = useRef<TextInput>(null);
-    const input6 = useRef<TextInput>(null);
-
+    const input1 = useRef<React.ElementRef<typeof TextInput>>(null);
+    const input2 = useRef<React.ElementRef<typeof TextInput>>(null);
+    const input3 = useRef<React.ElementRef<typeof TextInput>>(null);
+    const input4 = useRef<React.ElementRef<typeof TextInput>>(null);
+    const input5 = useRef<React.ElementRef<typeof TextInput>>(null);
+    const input6 = useRef<React.ElementRef<typeof TextInput>>(null);
 
     const [codigoArray, setCodigoArray] = useState(["", "", "", "", "", ""])
     // no use state, quando o valor dependendo do numero anterior pra coexisitir uma arrow function é a forma mais segura. No react os estados nao sao atualizados de forma simultânea.

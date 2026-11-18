@@ -31,7 +31,6 @@ public class Codigo {
     ArrayList<String> letras = new ArrayList<>();
 
     for (int i = 0; i <= 5; i++) {
-        double alfOrAlg = Math.random() * 2;
 
     String numeroAleatorio = algarismo[(int) (Math.random() * 9)];
     letras.add(numeroAleatorio);
@@ -72,7 +71,7 @@ public class Codigo {
                 
                 /*
                 } else if (digitarCod.equals("ENVIAR") || codigoExpirado == true) {
-                    //digitar.digitar("Um novo email com seu código foi enviado.");
+                    //digitar.digitar("Um n ovo email com seu código foi enviado.");
                     codigo = criarCod.criarCod();
                     existe.inserirCod(codigo);
                     codigoTable =  existe.pegarCod(codigo);
